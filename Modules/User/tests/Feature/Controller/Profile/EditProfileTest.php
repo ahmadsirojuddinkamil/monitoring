@@ -3,8 +3,8 @@
 namespace Modules\User\Tests\Feature\Profile;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class EditProfileTest extends TestCase
@@ -41,7 +41,7 @@ class EditProfileTest extends TestCase
 
     public function test_edit_profile_failed_because_you_not_logged_in(): void
     {
-        $response = $this->put("/profile/470d20af-a47f-4ce5-90a7-fdac0d8505f4", [
+        $response = $this->put('/profile/470d20af-a47f-4ce5-90a7-fdac0d8505f4', [
             'username' => 'client',
             'email' => 'client@gmail.com',
             'old_password' => '12345678',
@@ -78,7 +78,7 @@ class EditProfileTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->put("/profile/uuid", [
+        $response = $this->put('/profile/uuid', [
             'username' => 'client',
             'email' => 'client@gmail.com',
             'old_password' => '12345678',
@@ -97,7 +97,7 @@ class EditProfileTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->put("/profile/470d20af-a47f-4ce5-90a7-fdac0d8505f4", [
+        $response = $this->put('/profile/470d20af-a47f-4ce5-90a7-fdac0d8505f4', [
             'username' => 'client',
             'email' => 'client@gmail.com',
             'old_password' => '12345678',
@@ -127,7 +127,7 @@ class EditProfileTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect("/dashboard");
+        $response->assertRedirect('/dashboard');
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Invalid profile data!', session('error'));
     }

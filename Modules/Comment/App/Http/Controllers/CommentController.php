@@ -3,22 +3,30 @@
 namespace Modules\Comment\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Modules\Comment\App\Http\Requests\StoreCommentRequest;
-use Modules\Comment\App\Http\Requests\UpdateCommentRequest;
+use Modules\Comment\App\Http\Requests\{StoreCommentRequest, UpdateCommentRequest};
 use Modules\Comment\App\Models\Comment;
+use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;
 
 class CommentController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function store(StoreCommentRequest $request)
     {
         $validateData = $request->validated();
 
+        $userAuth = $this->userService->userAuth();
+
         Comment::create([
             'uuid' => Uuid::uuid4(),
-            'user_uuid' => Auth::user()->uuid,
-            'username' => Auth::user()->username,
+            'user_uuid' => $userAuth->uuid,
+            'username' => $userAuth->username,
             'comment' => $validateData['comment'],
         ]);
 
@@ -30,19 +38,19 @@ class CommentController extends Controller
         $comments = Comment::latest()->get();
 
         return view('comment::layouts.list', [
-            'comments' => $comments
+            'comments' => $comments,
         ]);
     }
 
     public function viewEdit($saveUuidFromCall)
     {
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/comment/list')->with(['error' => 'Invalid comment data!']);
         }
 
         $comment = Comment::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$comment) {
+        if (! $comment) {
             return redirect('/comment/list')->with(['error' => 'Comment not found!']);
         }
 
@@ -55,13 +63,13 @@ class CommentController extends Controller
     {
         $validateData = $request->validated();
 
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/comment/list')->with(['error' => 'Invalid comment data!']);
         }
 
         $comment = Comment::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$comment) {
+        if (! $comment) {
             return redirect('/comment/list')->with(['error' => 'Comment not found!']);
         }
 

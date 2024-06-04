@@ -3,8 +3,8 @@
 namespace Modules\User\Tests\Feature\Controller\Delete;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class DeleteUserTest extends TestCase
@@ -38,7 +38,7 @@ class DeleteUserTest extends TestCase
 
     public function test_delete_user_failed_because_you_not_logged_in(): void
     {
-        $response = $this->delete("/user/fb434b0b-f7b4-4f8c-a3a6-37cc939d5d1e");
+        $response = $this->delete('/user/fb434b0b-f7b4-4f8c-a3a6-37cc939d5d1e');
         $response->assertStatus(404);
     }
 
@@ -47,7 +47,7 @@ class DeleteUserTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->delete("/user/1239f484-e79f-412d-9fef-4202e8294fca");
+        $response = $this->delete('/user/1239f484-e79f-412d-9fef-4202e8294fca');
         $response->assertStatus(404);
     }
 
@@ -59,7 +59,7 @@ class DeleteUserTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->delete("/user/uuid");
+        $response = $this->delete('/user/uuid');
         $response->assertStatus(302);
         $response->assertRedirect('/user/list');
         $this->assertTrue(session()->has('error'));
@@ -74,7 +74,7 @@ class DeleteUserTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->delete("/user/53fe1a6d-4606-458d-a286-9d3093d2be72");
+        $response = $this->delete('/user/53fe1a6d-4606-458d-a286-9d3093d2be72');
         $response->assertStatus(302);
         $response->assertRedirect('/user/list');
         $this->assertTrue(session()->has('error'));

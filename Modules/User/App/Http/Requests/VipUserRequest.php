@@ -12,7 +12,7 @@ class VipUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|string'
+            'status' => 'required|string',
         ];
     }
 

@@ -3,8 +3,8 @@
 namespace Modules\Secret\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class SecretController extends Controller
 {

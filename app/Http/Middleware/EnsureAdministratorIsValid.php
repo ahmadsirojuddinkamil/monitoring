@@ -16,7 +16,9 @@ class EnsureAdministratorIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::id() || !Auth::user()->hasRole('administrator')) {
+        $user = Auth::user();
+
+        if (!$user || !$user->hasRole('administrator')) {
             return abort(404);
         }
 
