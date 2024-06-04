@@ -16,7 +16,7 @@ class EnsureUserAuthentication
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::id()) {
+        if (! Auth::id()) {
             return redirect('/login')->with('error', 'You must log in first!');
         }
 

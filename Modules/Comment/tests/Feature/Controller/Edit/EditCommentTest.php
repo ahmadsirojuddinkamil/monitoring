@@ -3,9 +3,9 @@
 namespace Modules\Comment\Tests\Feature\Controller\Edit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\Comment\App\Models\Comment;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class EditCommentTest extends TestCase
@@ -30,7 +30,7 @@ class EditCommentTest extends TestCase
 
         $comment = Comment::factory()->create();
         $response = $this->put("/comment/$comment->uuid", [
-            'comment' => 'test comment update'
+            'comment' => 'test comment update',
         ]);
 
         $response->assertStatus(302);
@@ -41,8 +41,8 @@ class EditCommentTest extends TestCase
 
     public function test_update_comment_failed_because_you_not_logged_in(): void
     {
-        $response = $this->put("/comment/uuid", [
-            'comment' => 'test comment update'
+        $response = $this->put('/comment/uuid', [
+            'comment' => 'test comment update',
         ]);
 
         $response->assertStatus(404);
@@ -58,7 +58,7 @@ class EditCommentTest extends TestCase
 
         $comment = Comment::factory()->create();
         $response = $this->put("/comment/$comment->uuid", [
-            'comment' => 'test comment update'
+            'comment' => 'test comment update',
         ]);
 
         $response->assertStatus(404);
@@ -74,7 +74,7 @@ class EditCommentTest extends TestCase
 
         $comment = Comment::factory()->create();
         $response = $this->put("/comment/$comment->uuid", [
-            'comment' => ''
+            'comment' => '',
         ]);
 
         $response->assertStatus(302);
@@ -89,8 +89,8 @@ class EditCommentTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->put("/comment/uuid", [
-            'comment' => 'test comment update'
+        $response = $this->put('/comment/uuid', [
+            'comment' => 'test comment update',
         ]);
 
         $response->assertStatus(302);
@@ -107,8 +107,8 @@ class EditCommentTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->put("/comment/7c4f0d4b-b2f2-40b1-8173-797edf88f9b2", [
-            'comment' => 'test comment update'
+        $response = $this->put('/comment/7c4f0d4b-b2f2-40b1-8173-797edf88f9b2', [
+            'comment' => 'test comment update',
         ]);
 
         $response->assertStatus(302);

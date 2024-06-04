@@ -3,8 +3,8 @@
 namespace Modules\User\Tests\Feature\Controller\Edit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class EditUserTest extends TestCase
@@ -29,7 +29,7 @@ class EditUserTest extends TestCase
         $client = $this->role->generateUser();
 
         $response = $this->put("/user/$client->uuid", [
-            'status' => 'bayar'
+            'status' => 'bayar',
         ]);
 
         $response->assertStatus(302);
@@ -42,8 +42,8 @@ class EditUserTest extends TestCase
 
     public function test_update_user_failed_because_you_not_logged_in(): void
     {
-        $response = $this->put("/user/uuid", [
-            'status' => 'bayar'
+        $response = $this->put('/user/uuid', [
+            'status' => 'bayar',
         ]);
 
         $response->assertStatus(404);
@@ -59,7 +59,7 @@ class EditUserTest extends TestCase
         $client = $this->role->generateUser();
 
         $response = $this->put("/user/$client->uuid", [
-            'status' => 'bayar'
+            'status' => 'bayar',
         ]);
 
         $response->assertStatus(404);
@@ -75,7 +75,7 @@ class EditUserTest extends TestCase
         $client = $this->role->generateUser();
 
         $response = $this->put("/user/$client->uuid", [
-            'status' => ''
+            'status' => '',
         ]);
 
         $response->assertStatus(302);
@@ -90,8 +90,8 @@ class EditUserTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->put("/user/uuid", [
-            'status' => 'bayar'
+        $response = $this->put('/user/uuid', [
+            'status' => 'bayar',
         ]);
 
         $response->assertStatus(302);
@@ -108,8 +108,8 @@ class EditUserTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->put("/user/7c4f0d4b-b2f2-40b1-8173-797edf88f9b2", [
-            'status' => 'bayar'
+        $response = $this->put('/user/7c4f0d4b-b2f2-40b1-8173-797edf88f9b2', [
+            'status' => 'bayar',
         ]);
 
         $response->assertStatus(302);

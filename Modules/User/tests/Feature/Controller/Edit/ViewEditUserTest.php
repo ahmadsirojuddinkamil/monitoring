@@ -3,8 +3,8 @@
 namespace Modules\User\Tests\Feature\Controller\Edit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class ViewEditUserTest extends TestCase
@@ -39,7 +39,7 @@ class ViewEditUserTest extends TestCase
 
     public function test_view_edit_user_failed_because_you_not_logged_in(): void
     {
-        $response = $this->get("/user/uuid/edit");
+        $response = $this->get('/user/uuid/edit');
         $response->assertStatus(404);
     }
 

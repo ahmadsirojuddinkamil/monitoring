@@ -1,0 +1,58 @@
+name: ContinuousIntegration
+
+on:
+  push:
+    branches:
+      - refactor-01-reduce-auth-calls
+
+jobs:
+  ContinuousIntegration:
+    name: Build Apps, Linter & Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v3
+
+      - name: Build Apps
+        run: composer install
+
+      - name: Generate Storage Testing
+        run: php artisan storage:link
+
+      - name: Generate Environment Testing
+        run: cp .env.example .env.testing
+
+      - name: Generate App Key
+        run: php artisan key:generate --env=testing
+
+      # - name: Generate Application Key Testing
+      #   run: |
+      #     sed -i 's#APP_ENV=local#APP_ENV=testing#' .env.testing
+      #     sed -i "s#DB_HOST=127.0.0.1#DB_HOST=${{ secrets }} #" .env.testing
+      #     sed -i "s#DB_DATABASE=laravel#DB_DATABASE=${{ secrets }} #" .env.testing
+      #     sed -i "s#DB_USERNAME=root#DB_USERNAME=${{ secrets }} #" .env.testing
+      #     sed -i "s#DB_PASSWORD=#DB_PASSWORD=${{ secrets }} #" .env.testing
+
+      # - name: Generate Env Testing Logging
+      #   run: |
+      #     cat << 'EOF' >> .env.testing
+      #     SALT_USER='${{ secrets }}'
+      #     EOF
+
+      # - name: View .env.testing
+      #   run: cat .env.testing
+
+      # - name: Update PHPUnit Configuration
+      #   run: |
+      #     sed -i "s#<env name=\"DB_DATABASE\" value=\"monitoring_testing\"/>#<env name=\"DB_DATABASE\" value=\"${{ secrets }}\"/>#" phpunit.xml
+
+      - name: Linter
+        run: |
+          linter_output=$(./vendor/bin/pint)
+          if [[ $linter_output == *"FIXED"* ]]; then
+            echo "there is an error in your code format, correct it and push the code again!"
+            exit 1
+          fi
+
+      # - name: Unit Test
+      # run: ./vendor/bin/phpunit --testsuite Feature

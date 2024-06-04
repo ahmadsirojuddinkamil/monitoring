@@ -3,9 +3,9 @@
 namespace Modules\Comment\Tests\Feature\Controller\Edit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\Comment\App\Models\Comment;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class ViewEditCommentTest extends TestCase
@@ -40,7 +40,7 @@ class ViewEditCommentTest extends TestCase
 
     public function test_view_edit_comment_failed_because_you_not_logged_in(): void
     {
-        $response = $this->get("/comment/uuid/edit");
+        $response = $this->get('/comment/uuid/edit');
         $response->assertStatus(404);
     }
 

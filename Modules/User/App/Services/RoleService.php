@@ -2,9 +2,9 @@
 
 namespace Modules\User\App\Services;
 
-use Spatie\Permission\Models\Role;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
+use Spatie\Permission\Models\Role;
 
 class RoleService
 {
@@ -33,7 +33,7 @@ class RoleService
             'username' => 'client',
             'email' => 'client@gmail.com',
             'password' => '12345678',
-            'status' => 'belum'
+            'status' => 'belum',
         ]);
 
         return $user;
