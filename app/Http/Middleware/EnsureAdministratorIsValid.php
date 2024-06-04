@@ -18,7 +18,7 @@ class EnsureAdministratorIsValid
     {
         $user = Auth::user();
 
-        if (!$user || !$user->hasRole('administrator')) {
+        if (! $user || ! $user->hasRole('administrator')) {
             return abort(404);
         }
 

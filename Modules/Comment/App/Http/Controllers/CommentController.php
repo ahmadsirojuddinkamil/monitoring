@@ -3,7 +3,8 @@
 namespace Modules\Comment\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Comment\App\Http\Requests\{StoreCommentRequest, UpdateCommentRequest};
+use Modules\Comment\App\Http\Requests\StoreCommentRequest;
+use Modules\Comment\App\Http\Requests\UpdateCommentRequest;
 use Modules\Comment\App\Models\Comment;
 use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;

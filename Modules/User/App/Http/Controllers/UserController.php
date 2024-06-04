@@ -3,8 +3,13 @@
 namespace Modules\User\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\{Auth, File, Storage};
-use Modules\User\App\Http\Requests\{LoginUserRequest, RegisterUserRequest, UpdateProfileRequest, VipUserRequest};
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Modules\User\App\Http\Requests\LoginUserRequest;
+use Modules\User\App\Http\Requests\RegisterUserRequest;
+use Modules\User\App\Http\Requests\UpdateProfileRequest;
+use Modules\User\App\Http\Requests\VipUserRequest;
 use Modules\User\App\Models\User;
 use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;
