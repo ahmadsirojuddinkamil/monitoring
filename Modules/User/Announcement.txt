@@ -1,0 +1,29 @@
+1. ubah lokasi providers di file auth.php menjadi lokasi module user
+   'users' => [
+        'driver' => 'eloquent',
+        'model' => env('AUTH_MODEL', Modules\User\Models\User::class),
+    ],
+    
+2. package ini bergantung dengan spatie/laravel-permission untuk authorize
+
+3. buat middleware EnsureUserAuthentication untuk check authentication kalau null harus abort 404
+   public function handle(Request $request, Closure $next): Response
+    {
+        if (!Auth::id()) {
+            return redirect('/login')->with('info', 'You must log in first!');
+        }
+
+        return $next($request);
+    }
+   lalu daftarkan alias middleware: 'auth_user' => EnsureUserAuthentication::class
+
+4. buat middleware EnsureUserAuthentication untuk check authentication dan authorization level
+   public function handle(Request $request, Closure $next): Response
+    {
+        if (!Auth::id() || !Auth::user()->hasRole('administrator')) {
+            return abort(404);
+        }
+
+        return $next($request);
+    }
+   lalu daftarkan alias middleware: 'auth_administrator' => EnsureAdministratorIsValid::class,

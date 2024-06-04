@@ -1,0 +1,9 @@
+{
+    "Comment": true,
+    "User": true,
+    "Home": true,
+    "Dashboard": true,
+    "Secret": true,
+    "Logging": true,
+    "Connection": true
+}

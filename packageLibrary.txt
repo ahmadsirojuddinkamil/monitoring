@@ -1,0 +1,35 @@
+composer require nwidart/laravel-modules
+    - Comment
+    - Dashboard
+    - Home
+    - Logging
+    - User
+    - Connection
+
+composer require guzzlehttp/guzzle
+    - Connection
+
+composer require spatie/laravel-permission
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Modules\\": "Modules/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        },
+        "merge-plugin": {
+            "include": [
+                "Modules/*/composer.json"
+            ]
+        }
+    },
+    - User
+    - Comment
+    - Dashboard
+    - Logging
+    - Connection
