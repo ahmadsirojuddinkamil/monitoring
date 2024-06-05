@@ -24,11 +24,11 @@ jobs:
       - name: Generate Storage Testing
         run: php artisan storage:link
 
-      - name: Generate Environment Testing
-        run: cp .env.example .env.testing
+      # - name: Generate Environment Testing
+      #   run: cp .env.example .env.testing
 
-      - name: Generate App Key
-        run: php artisan key:generate --env=testing
+      # - name: Generate App Key
+      #   run: php artisan key:generate --env=testing
 
       # - name: Generate Application Key Testing
       #   run: |
