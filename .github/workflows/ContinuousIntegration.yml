@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - refactor-01-reduce-auth-calls
+  pull_request:
+    branches:
+      - master
+      - development
+    types: [opened, synchronize, reopened]
 
 jobs:
   ContinuousIntegration:
