@@ -5,6 +5,5 @@
     "Dashboard": true,
     "Secret": true,
     "Logging": true,
-    "Connection": true,
-    "Branch1": true
+    "Connection": true
 }
