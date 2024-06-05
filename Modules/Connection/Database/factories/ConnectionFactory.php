@@ -3,7 +3,6 @@
 namespace Modules\Connection\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Auth;
 use Ramsey\Uuid\Uuid;
 
 class ConnectionFactory extends Factory

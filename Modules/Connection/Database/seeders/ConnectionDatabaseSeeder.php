@@ -2,8 +2,8 @@
 
 namespace Modules\Connection\Database\Seeders;
 
-use Modules\Connection\App\Models\Connection;
 use Illuminate\Database\Seeder;
+use Modules\Connection\App\Models\Connection;
 
 class ConnectionDatabaseSeeder extends Seeder
 {

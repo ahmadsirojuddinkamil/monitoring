@@ -51,7 +51,7 @@ class ConnectionService
         $url = $validateData['endpoint'];
         $domain = parse_url($url, PHP_URL_HOST);
 
-        if (!$domain) {
+        if (! $domain) {
             return false;
         }
 

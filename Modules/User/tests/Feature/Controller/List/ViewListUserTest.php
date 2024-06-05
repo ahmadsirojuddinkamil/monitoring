@@ -3,8 +3,8 @@
 namespace Modules\User\Tests\Feature\Controller\List;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class ViewListUserTest extends TestCase

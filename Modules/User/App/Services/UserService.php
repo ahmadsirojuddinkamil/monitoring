@@ -30,7 +30,7 @@ class UserService
     {
         $connection = Auth::user()->connection;
 
-        if (!$connection) {
+        if (! $connection) {
             return abort(404);
         }
     }

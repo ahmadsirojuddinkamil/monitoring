@@ -3,8 +3,8 @@
 namespace Modules\Dashboard\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Role;
 use Modules\User\App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {

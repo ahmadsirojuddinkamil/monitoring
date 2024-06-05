@@ -2,17 +2,27 @@
 
 namespace Modules\User\App\Http\Controllers;
 
-use Illuminate\Support\Facades\{Auth, File, Storage};
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Modules\User\App\Http\Requests\LoginUserRequest;
 use Modules\User\App\Http\Requests\RegisterUserRequest;
 use Modules\User\App\Http\Requests\UpdateProfileRequest;
 use Modules\User\App\Http\Requests\VipUserRequest;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;
 
 class UserController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     public function viewRegister()
     {
         return view('user::layouts.register');
@@ -72,17 +82,19 @@ class UserController extends Controller
 
     public function viewProfile($saveUuidFromCall)
     {
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/dashboard')->with(['error' => 'Invalid profile data!']);
         }
 
         $user = User::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect('/dashboard')->with(['error' => 'User not found!']);
         }
 
-        if (Auth::user()->uuid != $saveUuidFromCall) {
+        $userAuth = $this->userService->userAuth();
+
+        if ($userAuth->uuid != $saveUuidFromCall) {
             return redirect('/dashboard')->with(['error' => 'Invalid profile data!']);
         }
 
@@ -95,23 +107,25 @@ class UserController extends Controller
     {
         $validateData = $request->validated();
 
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/dashboard')->with(['error' => 'Invalid profile data!']);
         }
 
         $user = User::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect('/dashboard')->with(['error' => 'User not found!']);
         }
 
-        if (Auth::user()->uuid != $saveUuidFromCall) {
+        $userAuth = $this->userService->userAuth();
+
+        if ($userAuth->uuid != $saveUuidFromCall) {
             return redirect('/dashboard')->with(['error' => 'Invalid profile data!']);
         }
 
         $passwordHasing = null;
 
-        if (!empty($validateData['old_password']) && !empty($validateData['new_password'])) {
+        if (! empty($validateData['old_password']) && ! empty($validateData['new_password'])) {
             $salt = env('SALT_USER');
             $passwordInput = $salt.$validateData['old_password'].$salt;
 
@@ -119,12 +133,12 @@ class UserController extends Controller
                 return redirect("/profile/{$saveUuidFromCall}")->with('error_password', 'Wrong password!');
             }
 
-            $passwordHasing = password_hash($salt . $validateData['new_password'] . $salt, PASSWORD_ARGON2I);
+            $passwordHasing = password_hash($salt.$validateData['new_password'].$salt, PASSWORD_ARGON2I);
         }
 
-        if (!empty($validateData['new_profile'])) {
+        if (! empty($validateData['new_profile'])) {
             $storeFile = $validateData['new_profile']->store('public/profile_user');
-            $pathFile = 'storage/profile_user/' . basename($storeFile);
+            $pathFile = 'storage/profile_user/'.basename($storeFile);
 
             if ($user->profile != 'assets/dashboard/img/icons/user.png') {
                 Storage::delete(str_replace('storage/', 'public/', $user->profile));
@@ -159,17 +173,19 @@ class UserController extends Controller
 
     public function viewEdit($saveUuidFromCall)
     {
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/user/list')->with(['error' => 'Invalid user data!']);
         }
 
         $user = User::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect('/user/list')->with(['error' => 'User not found!']);
         }
 
-        if (Auth::user()->uuid == $saveUuidFromCall) {
+        $userAuth = $this->userService->userAuth();
+
+        if ($userAuth->uuid == $saveUuidFromCall) {
             return redirect('/user/list')->with(['error' => 'Cant edit yourself!']);
         }
 
@@ -182,13 +198,13 @@ class UserController extends Controller
     {
         $validateData = $request->validated();
 
-        if (!preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
+        if (! preg_match('/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i', $saveUuidFromCall)) {
             return redirect('/user/list')->with(['error' => 'Invalid user data!']);
         }
 
         $user = User::where('uuid', $saveUuidFromCall)->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect('/user/list')->with(['error' => 'User not found!']);
         }
 
@@ -217,7 +233,9 @@ class UserController extends Controller
             return redirect('/user/list')->with(['error' => 'User not found!']);
         }
 
-        if (Auth::user()->uuid == $saveUuidFromCall) {
+        $userAuth = $this->userService->userAuth();
+
+        if ($userAuth->uuid == $saveUuidFromCall) {
             return redirect('/user/list')->with(['error' => 'Cant erase yourself!']);
         }
 

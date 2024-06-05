@@ -3,9 +3,9 @@
 namespace Modules\Comment\Tests\Feature\Controller\List;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\Comment\App\Models\Comment;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class ViewListCommentTest extends TestCase

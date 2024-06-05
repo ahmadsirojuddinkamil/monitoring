@@ -17,7 +17,7 @@ class CreateCommentTest extends TestCase
         Auth::login($user);
 
         $response = $this->post('/comment', [
-            'comment' => 'comment test'
+            'comment' => 'comment test',
         ]);
         $response->assertStatus(302);
         $response->assertRedirect('/#comment');
@@ -31,7 +31,7 @@ class CreateCommentTest extends TestCase
         Auth::login($user);
 
         $response = $this->post('/comment', [
-            'comment' => ''
+            'comment' => '',
         ]);
 
         $response->assertStatus(302);
@@ -41,7 +41,7 @@ class CreateCommentTest extends TestCase
     public function test_create_comment_failed_because_you_not_logged_in(): void
     {
         $response = $this->post('/comment', [
-            'comment' => 'comment test'
+            'comment' => 'comment test',
         ]);
         $response->assertStatus(302);
         $response->assertRedirect('/login');

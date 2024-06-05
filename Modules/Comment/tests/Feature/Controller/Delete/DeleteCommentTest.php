@@ -3,9 +3,9 @@
 namespace Modules\Comment\Tests\Feature\Controller\Delete;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\User\App\Services\RoleService;
 use Modules\Comment\App\Models\Comment;
 use Modules\User\App\Models\User;
+use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
 
 class DeleteCommentTest extends TestCase
@@ -39,7 +39,7 @@ class DeleteCommentTest extends TestCase
 
     public function test_delete_comment_failed_because_you_not_logged_in(): void
     {
-        $response = $this->delete("/comment/fb434b0b-f7b4-4f8c-a3a6-37cc939d5d1e");
+        $response = $this->delete('/comment/fb434b0b-f7b4-4f8c-a3a6-37cc939d5d1e');
         $response->assertStatus(404);
     }
 
@@ -48,7 +48,7 @@ class DeleteCommentTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->delete("/comment/1239f484-e79f-412d-9fef-4202e8294fca");
+        $response = $this->delete('/comment/1239f484-e79f-412d-9fef-4202e8294fca');
         $response->assertStatus(404);
     }
 
@@ -60,7 +60,7 @@ class DeleteCommentTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->delete("/comment/uuid");
+        $response = $this->delete('/comment/uuid');
         $response->assertStatus(302);
         $response->assertRedirect('/comment/list');
         $this->assertTrue(session()->has('error'));
@@ -75,7 +75,7 @@ class DeleteCommentTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->delete("/comment/53fe1a6d-4606-458d-a286-9d3093d2be72");
+        $response = $this->delete('/comment/53fe1a6d-4606-458d-a286-9d3093d2be72');
         $response->assertStatus(302);
         $response->assertRedirect('/comment/list');
         $this->assertTrue(session()->has('error'));

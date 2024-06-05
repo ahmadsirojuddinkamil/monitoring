@@ -2,8 +2,8 @@
 
 namespace Modules\Connection\App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Connection\Database\factories\ConnectionFactory;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
