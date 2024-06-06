@@ -2,9 +2,9 @@
 
 namespace Modules\Connection\tests\Feature\Controller;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Connection\App\Models\Connection;
 use Modules\User\App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class CreateConnectionTest extends TestCase
@@ -37,7 +37,7 @@ class CreateConnectionTest extends TestCase
 
         $connection = Connection::factory()->create();
         $connection->update([
-            'user_uuid' => $user->uuid
+            'user_uuid' => $user->uuid,
         ]);
 
         $response = $this->get('/connection/create');

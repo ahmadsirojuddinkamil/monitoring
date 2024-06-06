@@ -2,9 +2,9 @@
 
 namespace Modules\Connection\tests\Feature\Controller;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Connection\App\Models\Connection;
 use Modules\User\App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class StoreConnectionTest extends TestCase
@@ -19,19 +19,19 @@ class StoreConnectionTest extends TestCase
         $key = '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3';
 
         $response = $this->post('/connection/create', [
-            "endpoint" => "https://endpoint.com/",
-            "register" => "https://endpoint.com/register-monitoring/$key",
-            "login" => "https://endpoint.com/login-monitoring/$key",
-            "get_log" => "https://endpoint.com/logging/$key",
-            "get_log_by_type" => "https://endpoint.com/logging/$key/type",
-            "get_log_by_time" => "https://endpoint.com/logging/$key/type/time",
-            "delete_log" => "https://endpoint.com/logging/$key",
-            "delete_log_by_type" => "https://endpoint.com/logging/$key/type",
-            "delete_log_by_time" => "https://endpoint.com/logging/$key/type/time",
+            'endpoint' => 'https://endpoint.com/',
+            'register' => "https://endpoint.com/register-monitoring/$key",
+            'login' => "https://endpoint.com/login-monitoring/$key",
+            'get_log' => "https://endpoint.com/logging/$key",
+            'get_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'get_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+            'delete_log' => "https://endpoint.com/logging/$key",
+            'delete_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'delete_log_by_time' => "https://endpoint.com/logging/$key/type/time",
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/connection/' . $user->uuid);
+        $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('success'));
         $this->assertEquals('Success create connection', session('success'));
     }
@@ -58,15 +58,15 @@ class StoreConnectionTest extends TestCase
         $key = '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3';
 
         $response = $this->post('/connection/create', [
-            "endpoint" => "https://endpoint.com/",
-            "register" => "https://endpoint.com/register-monitoring/$key",
-            "login" => "https://endpoint.com/login-monitoring/$key",
-            "get_log" => "https://endpoint.com/logging/$key",
-            "get_log_by_type" => "https://endpoint.com/logging/$key/type",
-            "get_log_by_time" => "https://endpoint.com/logging/$key/type/time",
-            "delete_log" => "https://endpoint.com/logging/$key",
-            "delete_log_by_type" => "https://endpoint.com/logging/$key/type",
-            "delete_log_by_time" => "https://endpoint.com/logging/$key/type/time",
+            'endpoint' => 'https://endpoint.com/',
+            'register' => "https://endpoint.com/register-monitoring/$key",
+            'login' => "https://endpoint.com/login-monitoring/$key",
+            'get_log' => "https://endpoint.com/logging/$key",
+            'get_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'get_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+            'delete_log' => "https://endpoint.com/logging/$key",
+            'delete_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'delete_log_by_time' => "https://endpoint.com/logging/$key/type/time",
         ]);
 
         $response->assertStatus(404);
@@ -78,15 +78,15 @@ class StoreConnectionTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->post('/connection/create', [
-            "endpoint" => "",
-            "register" => "",
-            "login" => "",
-            "get_log" => "",
-            "get_log_by_type" => "",
-            "get_log_by_time" => "",
-            "delete_log" => "",
-            "delete_log_by_type" => "",
-            "delete_log_by_time" => "",
+            'endpoint' => '',
+            'register' => '',
+            'login' => '',
+            'get_log' => '',
+            'get_log_by_type' => '',
+            'get_log_by_time' => '',
+            'delete_log' => '',
+            'delete_log_by_type' => '',
+            'delete_log_by_time' => '',
         ]);
 
         $response->assertStatus(302);
@@ -99,19 +99,19 @@ class StoreConnectionTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->post('/connection/create', [
-            "endpoint" => "https://endpoint.com/",
-            "register" => "https://endpoint.com/register-monitoring/KEY",
-            "login" => "https://endpoint.com/login-monitoring/KEY",
-            "get_log" => "https://endpoint.com/logging/KEY",
-            "get_log_by_type" => "https://endpoint.com/logging/KEY/type",
-            "get_log_by_time" => "https://endpoint.com/logging/KEY/type/time",
-            "delete_log" => "https://endpoint.com/logging/KEY",
-            "delete_log_by_type" => "https://endpoint.com/logging/KEY/type",
-            "delete_log_by_time" => "https://endpoint.com/logging/KEY/type/time",
+            'endpoint' => 'https://endpoint.com/',
+            'register' => 'https://endpoint.com/register-monitoring/KEY',
+            'login' => 'https://endpoint.com/login-monitoring/KEY',
+            'get_log' => 'https://endpoint.com/logging/KEY',
+            'get_log_by_type' => 'https://endpoint.com/logging/KEY/type',
+            'get_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'delete_log' => 'https://endpoint.com/logging/KEY',
+            'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
+            'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/connection/' . $user->uuid);
+        $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Your endpoint is invalid!', session('error'));
     }

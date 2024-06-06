@@ -3,7 +3,6 @@
 namespace Modules\Dashboard\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
 

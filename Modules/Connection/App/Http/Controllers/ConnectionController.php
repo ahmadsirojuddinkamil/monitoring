@@ -4,13 +4,11 @@ namespace Modules\Connection\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Connection\App\Http\Requests\ConnectionRequest;
+use Modules\Connection\App\Models\Connection;
 use Modules\Connection\App\Services\ConnectionService;
 use Modules\User\App\Models\User;
 use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Facades\Auth;
-
-use Modules\Connection\App\Models\Connection;
 
 class ConnectionController extends Controller
 {
@@ -54,6 +52,7 @@ class ConnectionController extends Controller
 
         try {
             Connection::createConnection($uuid, $validateData);
+
             return redirect('/connection/'.$uuid)->with('success', 'Success create connection');
         } catch (\Exception $error) {
             return redirect('/connection/'.$uuid)->with('error', 'An unexpected error occurred: '.$error->getMessage());
@@ -167,6 +166,7 @@ class ConnectionController extends Controller
 
         try {
             Connection::updateConnection($uuid, $validateData);
+
             return redirect('/connection/'.$uuid)->with('success', 'Success update connection');
         } catch (\Exception $error) {
             return redirect('/connection/'.$uuid)->with('error', 'An unexpected error occurred: '.$error->getMessage());
@@ -188,7 +188,7 @@ class ConnectionController extends Controller
 
             $connection->delete();
 
-            return redirect('/connection/list')->with(['success' => 'Success delete connection '. $connection->endpoint]);
+            return redirect('/connection/list')->with(['success' => 'Success delete connection '.$connection->endpoint]);
         } catch (\Exception $error) {
             return redirect('/connection/list')->with('error', 'An unexpected error occurred: '.$error->getMessage());
         }
