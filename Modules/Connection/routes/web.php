@@ -6,6 +6,8 @@ use Modules\Connection\App\Http\Controllers\ConnectionController;
 Route::controller(ConnectionController::class)->group(function () {
     Route::middleware('auth_administrator')->group(function () {
         Route::get('/connection/list', 'viewListConnection')->name('connection.view.list');
+        Route::get('/connection/list/{save_uuid_from_call}', 'show')->name('connection.list.view');
+        Route::delete('/connection/list/{save_uuid_from_call}', 'delete')->name('connection.list.delete');
     });
 
     Route::middleware('auth_user')->group(function () {
