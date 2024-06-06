@@ -51,17 +51,18 @@
                     </a>
 
                     <ul>
-                        <li>
-                            <a href="/connection/{{ Auth::user()->uuid }}"
-                                class="{{ Request::is('connection*') ? 'active' : '' }}">
-                                My Connection
-                            </a>
-                        </li>
-
                         @if (Auth::user()->hasRole('administrator'))
                             <li>
-                                <a href="/connection/list" class="">
+                                <a href="/connection/list"
+                                    class="{{ Request::is('connection/list*') ? 'active' : '' }}">
                                     Connection List
+                                </a>
+                            </li>
+                        @else
+                            <li>
+                                <a href="/connection/{{ Auth::user()->uuid }}"
+                                    class="{{ Request::is('connection/' . Auth::user()->uuid . '*') ? 'active' : '' }}">
+                                    My Connection
                                 </a>
                             </li>
                         @endif

@@ -1,0 +1,67 @@
+name: ContinuousDeployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ContinuousDeployment:
+    name: Build Apps, Linter & Testing
+    runs-on: ubuntu-latest
+    # needs: ContinuousIntegration
+    # if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v3
+
+      # - name: Build Apps
+      #   run: composer install
+
+      # - name: Generate Environment Production
+      #   run: cp .env.example .env
+
+      # - name: Generate Application Key
+      #   run: |
+      #     sed -i 's|APP_NAME=Laravel|APP_NAME=${{ secrets }}|' .env
+      #     sed -i 's|APP_ENV=local|APP_ENV=production|' .env
+      #     sed -i 's|APP_KEY=|APP_KEY=${{ secrets }}|' .env
+      #     sed -i 's|APP_DEBUG=true|APP_DEBUG=false|' .env
+      #     sed -i 's|APP_URL=http://localhost|APP_URL=${{ secrets }}|' .env
+
+      #     sed -i 's|DB_HOST=127.0.0.1|DB_HOST=${{ secrets }} |' .env
+      #     sed -i 's|DB_DATABASE=laravel|DB_DATABASE=${{ secrets }} |' .env
+      #     sed -i 's|DB_USERNAME=root|DB_USERNAME=${{ secrets }} |' .env
+      #     sed -i "s|DB_PASSWORD=|DB_PASSWORD=\"${{ secrets }}\"|" .env
+
+      # - name: Generate Env Logging
+      #   run: |
+      #     cat << 'EOF' >> .env
+      #     SALT_USER='${{ secrets }}'
+      #     EOF
+
+      # - name: FTP-Deploy-Data
+      #   uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      #   with:
+      #     server: ${{ secrets }}
+      #     username: ${{ secrets }}
+      #     password: ${{ secrets }}
+      #     exclude: |
+      #       public/**
+      #       .env.testing
+      #       phpunit.xml
+
+      # - name: Change App Data Location
+      #   run: |
+      #     sed -i 's|/../storage/framework/maintenance.php|/../monitoring/storage/framework/maintenance.php|g' public/index.php
+      #     sed -i 's|/../vendor/autoload.php|/../monitoring/vendor/autoload.php|g' public/index.php
+      #     sed -i 's|/../bootstrap/app.php|/../monitoring/bootstrap/app.php|g' public/index.php
+      #     rm -rf public/storage
+
+      # - name: FTP-Deploy-Public
+      #   uses: webitsbr/github-to-ftp@1.0.1
+      #   with:
+      #     server: ${{ secrets }}
+      #     username: ${{ secrets }}
+      #     password: ${{ secrets }}
+      #     local-dir: "./public/"

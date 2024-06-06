@@ -14,7 +14,7 @@ class ViewDashboardTest extends TestCase
     public function test_view_dashboard_success(): void
     {
         $user = User::factory()->create();
-        Auth::login($user);
+        $this->actingAs($user);
 
         $response = $this->get('/dashboard');
         $response->assertStatus(200);

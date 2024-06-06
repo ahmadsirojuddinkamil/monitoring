@@ -4,11 +4,13 @@ namespace Modules\Connection\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Connection\App\Http\Requests\ConnectionRequest;
-use Modules\Connection\App\Models\Connection;
 use Modules\Connection\App\Services\ConnectionService;
 use Modules\User\App\Models\User;
 use Modules\User\App\Services\UserService;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Auth;
+
+use Modules\Connection\App\Models\Connection;
 
 class ConnectionController extends Controller
 {
@@ -20,6 +22,42 @@ class ConnectionController extends Controller
     {
         $this->connectionService = $connectionService;
         $this->userService = $userService;
+    }
+
+    public function create()
+    {
+        $this->userService->checkUserNotHaveConnection();
+
+        // $uniqueId = Str::random(16);
+        // dd($uniqueId);
+
+        return view('connection::layouts.create');
+    }
+
+    public function store(ConnectionRequest $request)
+    {
+        $this->userService->checkUserNotHaveConnection();
+
+        $validateData = $request->validated();
+
+        $uuid = $this->userService->userAuth()->uuid;
+
+        $validationDomain = $this->connectionService->validationDomain($validateData);
+
+        if (! $validationDomain) {
+            return redirect('/connection/'.$uuid)->with('error', 'Your endpoint is invalid!');
+        }
+
+        if (Connection::where('endpoint', 'LIKE', '%'.$validationDomain.'%')->exists()) {
+            return redirect('/connection/'.$uuid)->with('error', 'Connection is already in use!');
+        }
+
+        try {
+            Connection::createConnection($uuid, $validateData);
+            return redirect('/connection/'.$uuid)->with('success', 'Success create connection');
+        } catch (\Exception $error) {
+            return redirect('/connection/'.$uuid)->with('error', 'An unexpected error occurred: '.$error->getMessage());
+        }
     }
 
     public function viewListConnection()
@@ -45,70 +83,53 @@ class ConnectionController extends Controller
             return redirect('/connection/'.$userAuth->uuid)->with(['error' => 'User not found!']);
         }
 
-        if ($user->uuid !== $saveUuidFromCall) {
-            return redirect('/connection/'.$userAuth->uuid)->with(['error' => 'Invalid connection data!']);
+        if ($userAuth->uuid !== $saveUuidFromCall) {
+            return abort(404);
         }
 
         return view('connection::layouts.show', [
             'connection' => $user->connection,
-            'uuid' => $userAuth->uuid,
+            'user' => $userAuth,
         ]);
     }
 
-    public function create()
+    public function show($saveUuidFromCall)
     {
-        $this->userService->checkUserNotHaveConnection();
+        $userAuth = $this->userService->userAuth();
 
-        // $uniqueId = Str::random(16);
-        // dd($uniqueId);
-
-        return view('connection::layouts.create');
-    }
-
-    public function store(ConnectionRequest $request)
-    {
-        try {
-            $this->userService->checkUserNotHaveConnection();
-
-            $validateData = $request->validated();
-
-            $uuid = $this->userService->userAuth()->uuid;
-
-            $validationDomain = $this->connectionService->validationDomain($validateData);
-
-            if (! $validationDomain) {
-                return redirect('/connection/'.$uuid)->with('error', 'Your endpoint is invalid!');
-            }
-
-            if (Connection::where('endpoint', 'LIKE', '%'.$validationDomain.'%')->exists()) {
-                return redirect('/connection/'.$uuid)->with('error', 'Connection is already in use!');
-            }
-
-            Connection::createConnection($uuid, $validateData);
-
-            return redirect('/connection/'.$uuid)->with('success', 'Success create connection');
-        } catch (\Exception $error) {
-            return redirect('/connection/'.$uuid)->with('error', 'An unexpected error occurred: '.$error->getMessage());
+        if (! Uuid::isValid($saveUuidFromCall)) {
+            return redirect('/connection/list')->with(['error' => 'Invalid connection data!']);
         }
+
+        $user = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
+
+        if (! $user) {
+            return redirect('/connection/list')->with(['error' => 'Connection not found!']);
+        }
+
+        return view('connection::layouts.show', [
+            'connection' => $user->connection,
+            'user' => $userAuth,
+        ]);
     }
 
     public function edit($saveUuidFromCall)
     {
         $this->userService->checkUserHaveConnection();
-        $user = $this->userService->userAuth();
+        $userAuth = $this->userService->userAuth();
 
         if (! Uuid::isValid($saveUuidFromCall)) {
-            return redirect('/connection/'.$user->uuid)->with(['error' => 'Invalid connection data!']);
+            return redirect('/connection/'.$userAuth->uuid)->with(['error' => 'Invalid connection data!']);
         }
 
         $connection = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
 
         if (! $connection) {
-            return redirect('/connection/'.$user->uuid)->with(['error' => 'User not found!']);
+            return redirect('/connection/'.$userAuth->uuid)->with(['error' => 'User not found!']);
         }
 
-        if ($user->uuid !== $saveUuidFromCall) {
-            return redirect('/connection/'.$user->uuid)->with(['error' => 'Invalid user data!']);
+        if ($userAuth->uuid !== $saveUuidFromCall) {
+            return abort(404);
         }
 
         return view('connection::layouts.edit', [
@@ -120,36 +141,56 @@ class ConnectionController extends Controller
     {
         $this->userService->checkUserHaveConnection();
 
+        $validateData = $request->validated();
+
+        $uuid = $this->userService->userAuth()->uuid;
+
+        if (! Uuid::isValid($saveUuidFromCall)) {
+            return redirect('/connection/'.$uuid)->with(['error' => 'Invalid connection data!']);
+        }
+
+        $user = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
+
+        if (! $user->connection) {
+            return redirect('/connection/'.$uuid)->with(['error' => 'Connection not found!']);
+        }
+
+        if ($uuid !== $saveUuidFromCall) {
+            return abort(404);
+        }
+
+        $validationDomain = $this->connectionService->validationDomain($validateData);
+
+        if (! $validationDomain) {
+            return redirect('/connection/'.$uuid)->with('error', 'Your endpoint is invalid!');
+        }
+
         try {
-            $validateData = $request->validated();
-
-            $uuid = $this->userService->userAuth()->uuid;
-
-            if (! Uuid::isValid($saveUuidFromCall)) {
-                return redirect('/connection/'.$uuid)->with(['error' => 'Invalid connection data!']);
-            }
-
-            $user = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
-
-            if (! $user->connection) {
-                return redirect('/connection/'.$uuid)->with(['error' => 'Connection not found!']);
-            }
-
-            if ($uuid !== $saveUuidFromCall) {
-                return redirect('/connection/'.$uuid)->with(['error' => 'Invalid connection data!']);
-            }
-
-            $validationDomain = $this->connectionService->validationDomain($validateData);
-
-            if (! $validationDomain) {
-                return redirect('/connection/'.$uuid)->with('error', 'Your endpoint is invalid!');
-            }
-
             Connection::updateConnection($uuid, $validateData);
-
             return redirect('/connection/'.$uuid)->with('success', 'Success update connection');
         } catch (\Exception $error) {
             return redirect('/connection/'.$uuid)->with('error', 'An unexpected error occurred: '.$error->getMessage());
+        }
+    }
+
+    public function delete($saveUuidFromCall)
+    {
+        try {
+            if (! Uuid::isValid($saveUuidFromCall)) {
+                return redirect('/connection/list')->with(['error' => 'Invalid connection data!']);
+            }
+
+            $connection = Connection::where('uuid', $saveUuidFromCall)->first();
+
+            if (! $connection) {
+                return redirect('/connection/list')->with(['error' => 'Connection not found!']);
+            }
+
+            $connection->delete();
+
+            return redirect('/connection/list')->with(['success' => 'Success delete connection '. $connection->endpoint]);
+        } catch (\Exception $error) {
+            return redirect('/connection/list')->with('error', 'An unexpected error occurred: '.$error->getMessage());
         }
     }
 }
