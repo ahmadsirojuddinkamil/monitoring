@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Connection\Database\Factories;
+namespace Modules\Connection\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Ramsey\Uuid\Uuid;

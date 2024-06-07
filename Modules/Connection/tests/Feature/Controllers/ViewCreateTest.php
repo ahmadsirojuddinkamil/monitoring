@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Connection\tests\Feature\Controller;
+namespace Modules\Connection\tests\Feature\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Connection\App\Models\Connection;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
 
-class CreateConnectionTest extends TestCase
+class ViewCreateTest extends TestCase
 {
     use RefreshDatabase;
 

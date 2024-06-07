@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Connection\tests\Feature\Controller;
+namespace Modules\Connection\tests\Feature\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Connection\App\Models\Connection;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
 
-class StoreConnectionTest extends TestCase
+class StoreTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -45,7 +45,7 @@ class StoreConnectionTest extends TestCase
         $this->assertEquals('You must log in first!', session('error'));
     }
 
-    public function test_create_connection_failed_because_already_has_a_connection(): void
+    public function test_create_connection_failed_because_user_already_has_a_connection(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -114,5 +114,32 @@ class StoreConnectionTest extends TestCase
         $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Your endpoint is invalid!', session('error'));
+    }
+
+    public function test_create_connection_failed_because_endpoint_has_already_been_created(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Connection::factory()->create();
+
+        $key = '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3';
+
+        $response = $this->post('/connection/create', [
+            'endpoint' => 'https://endpoint.com/',
+            'register' => "https://endpoint.com/register-monitoring/$key",
+            'login' => "https://endpoint.com/login-monitoring/$key",
+            'get_log' => "https://endpoint.com/logging/$key",
+            'get_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'get_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+            'delete_log' => "https://endpoint.com/logging/$key",
+            'delete_log_by_type' => "https://endpoint.com/logging/$key/type",
+            'delete_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/connection/'.$user->uuid);
+        $this->assertTrue(session()->has('error'));
+        $this->assertEquals('Connection is already in use!', session('error'));
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\Comment\App\Models\Comment;
 use Modules\Connection\App\Models\Connection;
+use Modules\User\Database\factories\UserClientFactory;
 use Modules\User\Database\factories\UserFactory;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -31,6 +32,11 @@ class User extends Authenticatable
     protected static function newFactory(): UserFactory
     {
         return UserFactory::new();
+    }
+
+    protected static function clientFactory(): UserClientFactory
+    {
+        return UserClientFactory::new();
     }
 
     // Relationship

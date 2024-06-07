@@ -5,7 +5,7 @@ namespace Modules\User\Database\factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Ramsey\Uuid\Uuid;
 
-class UserFactory extends Factory
+class UserClientFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -22,8 +22,8 @@ class UserFactory extends Factory
 
         return [
             'uuid' => Uuid::uuid4(),
-            'username' => 'test',
-            'email' => 'test@gmail.com',
+            'username' => 'client',
+            'email' => 'client@gmail.com',
             'password' => $hashPassword,
         ];
     }
