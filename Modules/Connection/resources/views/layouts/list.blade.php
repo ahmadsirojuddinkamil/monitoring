@@ -92,9 +92,9 @@
                                             <td>{{ $connection->user->email ?? '' }}</td>
                                             <td>{{ $connection->endpoint }}</td>
                                             <td>
-                                                <a class="me-3" href="">
-                                                    <img src="{{ asset('assets/dashboard/img/icons/edit.svg') }}"
-                                                        alt="img">
+                                                <a class="me-3" href="/connection/list/{{ $connection->uuid }}">
+                                                    <img src="{{ asset('assets/dashboard/img/icons/show.png') }}"
+                                                        height="25" width="25" alt="img">
                                                 </a>
 
                                                 <a class="action-button" data-bs-toggle="modal"
@@ -123,7 +123,8 @@
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">No</button>
 
-                                                                <form action="" method="POST" class="action-form">
+                                                                <form action="/connection/list/{{ $connection->uuid }}"
+                                                                    method="POST" class="action-form">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="submit"

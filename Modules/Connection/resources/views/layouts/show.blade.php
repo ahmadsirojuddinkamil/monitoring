@@ -9,7 +9,7 @@
         content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
     <meta name="author" content="Dreamguys - Bootstrap Admin Template">
     <meta name="robots" content="noindex, nofollow">
-    <title>Loggingpedia | my connection</title>
+    <title>Loggingpedia | my connection {{ Auth::user()->username }}</title>
 
     @include('dashboard::bases.css')
 </head>
@@ -28,21 +28,23 @@
             <div class="content">
                 <div class="page-header">
                     <div class="page-title">
-                        <h4>My Connection</h4>
+                        <h4>Connection {{ $user->username }}</h4>
                     </div>
 
                     <div class="wordset">
                         <ul>
-                            @if ($connection)
-                                <a href="/connection/{{ $uuid }}/edit" class="link-with-margin">
-                                    <img src="{{ asset('assets/dashboard/img/icons/edit.png') }}" alt="img"
-                                        height="20" width="20">
-                                </a>
-                            @else
-                                <a href="/connection/create" class="link-with-margin">
-                                    <img src="{{ asset('assets/dashboard/img/icons/add.png') }}" alt="img"
-                                        height="20" width="20">
-                                </a>
+                            @if (!Auth::user()->hasRole('administrator'))
+                                @if ($connection)
+                                    <a href="/connection/{{ $user->uuid }}/edit" class="link-with-margin">
+                                        <img src="{{ asset('assets/dashboard/img/icons/edit.png') }}" alt="img"
+                                            height="20" width="20">
+                                    </a>
+                                @else
+                                    <a href="/connection/create" class="link-with-margin">
+                                        <img src="{{ asset('assets/dashboard/img/icons/add.png') }}" alt="img"
+                                            height="20" width="20">
+                                    </a>
+                                @endif
                             @endif
                         </ul>
                     </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Connection\Database\Factories;
+namespace Modules\Connection\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Ramsey\Uuid\Uuid;
@@ -10,7 +10,7 @@ class ConnectionFactory extends Factory
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = \Modules\Connection\Models\Connection::class;
+    protected $model = \Modules\Connection\App\Models\Connection::class;
 
     /**
      * Define the model's default state.
@@ -21,14 +21,14 @@ class ConnectionFactory extends Factory
             'uuid' => Uuid::uuid4(),
             'user_uuid' => null,
             'endpoint' => 'https://endpoint.com/',
-            'register' => 'https://endpoint.com/register',
-            'login' => 'https://endpoint.com/login',
-            'get_log' => 'https://endpoint.com/get_log',
-            'get_log_by_type' => 'https://endpoint.com/get_log_by_type',
-            'get_log_by_time' => 'https://endpoint.com/get_log_by_time',
-            'delete_log' => 'https://endpoint.com/delete_log',
-            'delete_log_by_type' => 'https://endpoint.com/delete_log_by_type',
-            'delete_log_by_time' => 'https://endpoint.com/delete_log_by_time',
+            'register' => 'https://endpoint.com/register-monitoring/KEY',
+            'login' => 'https://endpoint.com/login-monitoring/KEY',
+            'get_log' => 'https://endpoint.com/logging/KEY',
+            'get_log_by_type' => 'https://endpoint.com/logging/KEY/type',
+            'get_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'delete_log' => 'https://endpoint.com/logging/KEY',
+            'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
+            'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
         ];
     }
 }

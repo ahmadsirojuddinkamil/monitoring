@@ -4,6 +4,7 @@ namespace Modules\Connection\App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Connection\Database\factories\ClientConnectionFactory;
 use Modules\Connection\Database\factories\ConnectionFactory;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
@@ -29,9 +30,15 @@ class Connection extends Model
         'delete_log_by_time',
     ];
 
+    // Factory
     protected static function newFactory(): ConnectionFactory
     {
         return ConnectionFactory::new();
+    }
+
+    protected static function clientFactory(): ClientConnectionFactory
+    {
+        return ClientConnectionFactory::new();
     }
 
     // Relationship
@@ -61,7 +68,7 @@ class Connection extends Model
 
     public static function updateConnection($saveUuidFromCall, $saveDataFromCall)
     {
-        $connection = self::where('user_uuid', $saveUuidFromCall)->first();
+        $connection = self::where('uuid', $saveUuidFromCall)->first();
 
         return $connection->update([
             'endpoint' => $saveDataFromCall['endpoint'],
@@ -74,7 +81,5 @@ class Connection extends Model
             'delete_log_by_type' => $saveDataFromCall['delete_log_by_type'],
             'delete_log_by_time' => $saveDataFromCall['delete_log_by_time'],
         ]);
-
-        // return $connection;
     }
 }

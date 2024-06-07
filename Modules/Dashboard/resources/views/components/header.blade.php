@@ -102,7 +102,11 @@
 
                         <div class="profilesets">
                             <h6>{{ Auth::user()->username }}</h6>
-                            <h5>Member</h5>
+                            @if (Auth::user()->hasRole('administrator'))
+                                <h5>Admin</h5>
+                            @else
+                                <h5>Member</h5>
+                            @endif
                         </div>
                     </div>
 
