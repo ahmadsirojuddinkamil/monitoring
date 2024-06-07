@@ -28,7 +28,7 @@
             <div class="content">
                 <div class="page-header">
                     <div class="page-title">
-                        <h4>Connection {{ Auth::user()->username }}</h4>
+                        <h4>Connection {{ $user->username }}</h4>
                     </div>
 
                     <div class="wordset">

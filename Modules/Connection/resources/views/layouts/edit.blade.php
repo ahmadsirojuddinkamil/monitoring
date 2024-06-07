@@ -47,7 +47,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <form action="/connection/{{ Auth::user()->uuid }}" method="POST">
+                            <form action="/connection/{{ $connection->uuid }}" method="POST">
                                 @csrf
                                 @method('PUT')
 

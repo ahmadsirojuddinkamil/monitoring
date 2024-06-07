@@ -92,7 +92,7 @@
                                             <td>{{ $connection->user->email ?? '' }}</td>
                                             <td>{{ $connection->endpoint }}</td>
                                             <td>
-                                                <a class="me-3" href="/connection/list/{{ $connection->user->uuid }}">
+                                                <a class="me-3" href="/connection/list/{{ $connection->uuid }}">
                                                     <img src="{{ asset('assets/dashboard/img/icons/show.png') }}"
                                                         height="25" width="25" alt="img">
                                                 </a>
