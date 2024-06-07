@@ -58,7 +58,7 @@ class ViewOtherConnectionTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->get("/connection/list/uuid");
+        $response = $this->get('/connection/list/uuid');
         $response->assertStatus(302);
         $response->assertRedirect('/connection/list');
         $this->assertTrue(session()->has('error'));
@@ -73,7 +73,7 @@ class ViewOtherConnectionTest extends TestCase
         $this->role->generateRole();
         $this->role->assignRoleAdministrator();
 
-        $response = $this->get("/connection/list/af49813f-68a2-4d89-be8b-d5ece39af788");
+        $response = $this->get('/connection/list/af49813f-68a2-4d89-be8b-d5ece39af788');
         $response->assertStatus(302);
         $response->assertRedirect('/connection/list');
         $this->assertTrue(session()->has('error'));

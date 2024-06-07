@@ -2,10 +2,10 @@
 
 namespace Modules\Connection\tests\Feature\Controllers;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Connection\App\Models\Connection;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ViewEditTest extends TestCase
 {
@@ -28,7 +28,7 @@ class ViewEditTest extends TestCase
 
     public function test_view_edit_connection_failed_because_not_login(): void
     {
-        $response = $this->get("/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3/edit");
+        $response = $this->get('/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3/edit');
         $response->assertStatus(302);
         $response->assertRedirect('/login');
         $this->assertTrue(session()->has('error'));
@@ -40,7 +40,7 @@ class ViewEditTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->get("/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3/edit");
+        $response = $this->get('/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3/edit');
         $response->assertStatus(404);
     }
 
@@ -54,9 +54,9 @@ class ViewEditTest extends TestCase
             'user_uuid' => $user->uuid->toString(),
         ]);
 
-        $response = $this->get("/connection/uuid/edit");
+        $response = $this->get('/connection/uuid/edit');
         $response->assertStatus(302);
-        $response->assertRedirect('/connection/' . $user->uuid);
+        $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Invalid connection data!', session('error'));
     }
@@ -71,7 +71,7 @@ class ViewEditTest extends TestCase
             'user_uuid' => $user->uuid->toString(),
         ]);
 
-        $response = $this->get("/connection/38df4212-1c35-43c2-bb6b-80c47a15d673/edit");
+        $response = $this->get('/connection/38df4212-1c35-43c2-bb6b-80c47a15d673/edit');
         $response->assertStatus(404);
     }
 

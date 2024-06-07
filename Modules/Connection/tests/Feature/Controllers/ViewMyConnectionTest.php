@@ -2,9 +2,9 @@
 
 namespace Modules\Connection\tests\Feature\Controllers;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ViewMyConnectionTest extends TestCase
 {
@@ -17,12 +17,12 @@ class ViewMyConnectionTest extends TestCase
 
         $response = $this->get("/connection/$user->uuid");
         $response->assertStatus(200);
-        $response->assertSeeText('Connection ' . $user->username);
+        $response->assertSeeText('Connection '.$user->username);
     }
 
     public function test_view_my_connection_failed_because_not_login(): void
     {
-        $response = $this->get("/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3");
+        $response = $this->get('/connection/fbc0e78e-a806-4455-a8db-82e617f94ae3');
         $response->assertStatus(302);
         $response->assertRedirect('/login');
         $this->assertTrue(session()->has('error'));
@@ -34,9 +34,9 @@ class ViewMyConnectionTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->get("/connection/uuid");
+        $response = $this->get('/connection/uuid');
         $response->assertStatus(302);
-        $response->assertRedirect('/connection/' . $user->uuid);
+        $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Invalid connection data!', session('error'));
     }
@@ -46,7 +46,7 @@ class ViewMyConnectionTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->get("/connection/9aec2303-e9fa-42d1-be12-ade599a19f65");
+        $response = $this->get('/connection/9aec2303-e9fa-42d1-be12-ade599a19f65');
         $response->assertStatus(404);
     }
 

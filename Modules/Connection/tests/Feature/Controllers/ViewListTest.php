@@ -2,10 +2,10 @@
 
 namespace Modules\Connection\tests\Feature\Controllers;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\User\App\Models\User;
 use Modules\User\App\Services\RoleService;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ViewListTest extends TestCase
 {

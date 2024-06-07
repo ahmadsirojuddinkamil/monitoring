@@ -138,7 +138,7 @@ class StoreTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/connection/' . $user->uuid);
+        $response->assertRedirect('/connection/'.$user->uuid);
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Connection is already in use!', session('error'));
     }

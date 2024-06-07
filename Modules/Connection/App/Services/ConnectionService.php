@@ -44,7 +44,6 @@ class ConnectionService
 
         $secretKeys = array_filter($secretKeys);
 
-
         if (count($secretKeys) != 8) {
             return false;
         }
@@ -52,7 +51,7 @@ class ConnectionService
         $url = $validateData['endpoint'];
         $domain = parse_url($url, PHP_URL_HOST);
 
-        if (!$domain) {
+        if (! $domain) {
             return false;
         }
 

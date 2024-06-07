@@ -55,14 +55,14 @@ class ConnectionServiceTest extends TestCase
 
         $data = [
             'endpoint' => 'https://endpoint.com/',
-            'register' => "https://endpoint.com/",
-            'login' => "https://endpoint.com/",
-            'get_log' => "https://endpoint.com/",
-            'get_log_by_type' => "https://endpoint.com/",
-            'get_log_by_time' => "https://endpoint.com/",
-            'delete_log' => "https://endpoint.com/",
-            'delete_log_by_type' => "https://endpoint.com/",
-            'delete_log_by_time' => "https://endpoint.com/",
+            'register' => 'https://endpoint.com/',
+            'login' => 'https://endpoint.com/',
+            'get_log' => 'https://endpoint.com/',
+            'get_log_by_type' => 'https://endpoint.com/',
+            'get_log_by_time' => 'https://endpoint.com/',
+            'delete_log' => 'https://endpoint.com/',
+            'delete_log_by_type' => 'https://endpoint.com/',
+            'delete_log_by_time' => 'https://endpoint.com/',
         ];
 
         $connectionService = new ConnectionService();
