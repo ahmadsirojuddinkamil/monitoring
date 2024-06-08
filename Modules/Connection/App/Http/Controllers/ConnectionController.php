@@ -51,7 +51,7 @@ class ConnectionController extends Controller
         }
 
         try {
-            Connection::createConnection($uuid, $validateData);
+            $connection = Connection::createConnection($uuid, $validateData);
 
             return redirect('/connection/'.$uuid)->with('success', 'Success create connection');
         } catch (\Exception $error) {

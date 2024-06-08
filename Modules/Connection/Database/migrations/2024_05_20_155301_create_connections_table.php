@@ -13,7 +13,7 @@ return new class() extends Migration
     {
         Schema::create('connections', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
+            $table->uuid('uuid')->unique();
             $table->foreignUuid('user_uuid')->nullable();
             $table->string('endpoint');
             $table->string('register');
