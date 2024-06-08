@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Connection\Database\factories\ClientConnectionFactory;
 use Modules\Connection\Database\factories\ConnectionFactory;
+use Modules\Logging\App\Models\Logging;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
 
@@ -46,6 +47,11 @@ class Connection extends Model
     {
         // user_uuid: untuk kolom meletakkan key target relasi || uuid: kolom target relasi yang valuenya disimpan di user_uuid
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
+    }
+
+    public function loggings()
+    {
+        return $this->hasMany(Logging::class, 'connection_uuid', 'uuid');
     }
 
     // Query

@@ -3,17 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Logging\App\Http\Controllers\LoggingController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::group([], function () {
-    Route::resource('logging', LoggingController::class)->names('logging');
+Route::controller(LoggingController::class)->group(function () {
+    Route::middleware('auth_user')->group(function () {
+        Route::get('/logging/{save_uuid_from_call}', 'viewMyLogging')->name('logging.view');
+    });
 });

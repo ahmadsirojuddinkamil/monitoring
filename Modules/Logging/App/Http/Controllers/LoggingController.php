@@ -3,64 +3,45 @@
 namespace Modules\Logging\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Modules\User\App\Models\User;
+use Modules\User\App\Services\UserService;
+use Ramsey\Uuid\Uuid;
 
 class LoggingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $userService;
+
+    public function __construct(UserService $userService)
     {
-        return view('logging::index');
+        $this->userService = $userService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function viewMyLogging($saveUuidFromCall)
     {
-        return view('logging::create');
-    }
+        $userAuth = $this->userService->userAuth();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
+        if (! Uuid::isValid($saveUuidFromCall)) {
+            return redirect('/logging/'.$userAuth->uuid)->with(['error' => 'Invalid logging data!']);
+        }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('logging::show');
-    }
+        $user = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('logging::edit');
-    }
+        if (! $user) {
+            return abort(404);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
+        $connection = $user->connection->load('loggings');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
+        if ($userAuth->uuid != $saveUuidFromCall) {
+            return abort(404);
+        }
+
+        $loggings = $connection->loggings()->latest()->paginate(10);
+
+        return view('logging::layouts.show', [
+            'user' => $userAuth,
+            'endpoint' => $user->connection['endpoint'],
+            'loggings' => $loggings,
+        ]);
     }
 }
