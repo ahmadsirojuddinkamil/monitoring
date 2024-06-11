@@ -3,8 +3,8 @@
 namespace Modules\Logging\App\Services;
 
 use Illuminate\Support\Facades\Auth;
-use Modules\User\App\Models\User;
 use Illuminate\Validation\ValidationException;
+use Modules\User\App\Models\User;
 
 class LoggingService
 {
@@ -18,13 +18,13 @@ class LoggingService
 
         $user = User::with('connection.loggings')->where('uuid', $saveUuid)->firstOrFail();
 
-        if (!$user) {
+        if (! $user) {
             return abort(404);
         }
 
         return [
             'userAuth' => $userAuth,
-            'user' => $user
+            'user' => $user,
         ];
     }
 

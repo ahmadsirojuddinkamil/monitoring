@@ -4,8 +4,8 @@ namespace Modules\Logging\Database\factories;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
+use Ramsey\Uuid\Uuid;
 
 class LoggingFactory extends Factory
 {
