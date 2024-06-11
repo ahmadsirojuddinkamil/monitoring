@@ -3,45 +3,65 @@
 namespace Modules\Logging\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\User\App\Models\User;
-use Modules\User\App\Services\UserService;
+use Illuminate\Support\Facades\DB;
+use Modules\Logging\App\Services\LoggingService;
 use Ramsey\Uuid\Uuid;
 
 class LoggingController extends Controller
 {
-    protected $userService;
+    protected $loggingService;
 
-    public function __construct(UserService $userService)
+    public function __construct(LoggingService $loggingService)
     {
-        $this->userService = $userService;
+        $this->loggingService = $loggingService;
     }
 
     public function viewMyLogging($saveUuidFromCall)
     {
-        $userAuth = $this->userService->userAuth();
-
         if (! Uuid::isValid($saveUuidFromCall)) {
-            return redirect('/logging/'.$userAuth->uuid)->with(['error' => 'Invalid logging data!']);
-        }
-
-        $user = User::with('connection')->where('uuid', $saveUuidFromCall)->first();
-
-        if (! $user) {
             return abort(404);
         }
 
-        $connection = $user->connection->load('loggings');
+        return DB::transaction(function () use ($saveUuidFromCall) {
+            $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
 
-        if ($userAuth->uuid != $saveUuidFromCall) {
+            $loggings = $validationUser['user']->connection->loggings()->latest()->paginate(10);
+
+            return view('logging::layouts.show', [
+                'user' => $validationUser['userAuth'],
+                'endpoint' => $validationUser['user']->connection['endpoint'],
+                'loggings' => $loggings,
+            ]);
+        });
+    }
+
+    public function searchLogging($saveUuidFromCall)
+    {
+        if (! Uuid::isValid($saveUuidFromCall)) {
             return abort(404);
         }
 
-        $loggings = $connection->loggings()->latest()->paginate(10);
+        $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
 
-        return view('logging::layouts.show', [
-            'user' => $userAuth,
-            'endpoint' => $user->connection['endpoint'],
-            'loggings' => $loggings,
-        ]);
+        $validationSearch = $this->loggingService->validationSearch();
+
+        if (! is_array($validationSearch)) {
+            return redirect('/logging/'.$saveUuidFromCall)->with('error', $validationSearch);
+        }
+
+        return DB::transaction(function () use ($validationUser, $validationSearch) {
+            $loggings = $validationUser['user']->connection->loggings()
+                ->where('type', $validationSearch['type'])
+                ->whereBetween('created_at', [$validationSearch['time-start'], $validationSearch['time-end']])
+                ->paginate(2);
+
+            $loggings->appends(request()->query());
+
+            return view('logging::layouts.show', [
+                'user' => $validationUser['userAuth'],
+                'endpoint' => $validationUser['user']->connection['endpoint'],
+                'loggings' => $loggings,
+            ]);
+        });
     }
 }

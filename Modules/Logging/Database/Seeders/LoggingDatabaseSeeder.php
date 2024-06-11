@@ -13,6 +13,6 @@ class LoggingDatabaseSeeder extends Seeder
     public function run(): void
     {
         // $this->call([]);
-        Logging::factory()->count(4000)->create();
+        Logging::factory()->count(8)->create();
     }
 }
