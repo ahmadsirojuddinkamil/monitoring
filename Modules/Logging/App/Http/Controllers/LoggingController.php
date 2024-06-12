@@ -22,12 +22,12 @@ class LoggingController extends Controller
             return abort(404);
         }
 
-        return DB::transaction(function () use ($saveUuidFromCall) {
-            $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
+        $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
 
+        return DB::transaction(function () use ($validationUser) {
             $loggings = $validationUser['user']->connection->loggings()->latest()->paginate(10);
 
-            return view('logging::layouts.show', [
+            return view('logging::layouts.list', [
                 'user' => $validationUser['userAuth'],
                 'endpoint' => $validationUser['user']->connection['endpoint'],
                 'loggings' => $loggings,
@@ -57,11 +57,24 @@ class LoggingController extends Controller
 
             $loggings->appends(request()->query());
 
-            return view('logging::layouts.show', [
+            return view('logging::layouts.list', [
                 'user' => $validationUser['userAuth'],
                 'endpoint' => $validationUser['user']->connection['endpoint'],
                 'loggings' => $loggings,
             ]);
         });
+    }
+
+    public function viewCreate($saveUuid)
+    {
+        if (! Uuid::isValid($saveUuid)) {
+            return abort(404);
+        }
+
+        $validationUser = $this->loggingService->validationUser($saveUuid);
+
+        return view('logging::layouts.create', [
+            'connection' => $validationUser['user']->connection,
+        ]);
     }
 }

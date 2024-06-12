@@ -4,21 +4,23 @@ namespace Modules\Logging\App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Modules\Connection\App\Models\Connection;
+use Modules\Logging\App\Models\Logging;
 use Modules\User\App\Models\User;
 
 class LoggingService
 {
     public function validationUser($saveUuid)
     {
-        $userAuth = Auth::user();
-
-        if ($userAuth->uuid != $saveUuid) {
-            return abort(404);
-        }
-
         $user = User::with('connection.loggings')->where('uuid', $saveUuid)->firstOrFail();
 
         if (! $user) {
+            return abort(404);
+        }
+
+        $userAuth = Auth::user();
+
+        if ($userAuth->uuid != $saveUuid) {
             return abort(404);
         }
 
@@ -39,5 +41,16 @@ class LoggingService
         } catch (ValidationException $errors) {
             return $errors->getMessage();
         }
+    }
+
+    public function generateConnectionLog($saveUser)
+    {
+        $connection = Connection::factory()->create([
+            'user_uuid' => $saveUser->uuid,
+        ]);
+
+        Logging::factory()->create([
+            'connection_uuid' => $connection->uuid,
+        ]);
     }
 }

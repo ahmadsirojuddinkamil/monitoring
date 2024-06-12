@@ -30,6 +30,12 @@
                         <h4>LOG List</h4>
                         <h6>Manage your Logging</h6>
                     </div>
+
+                    <div class="page-btn">
+                        <a href="/logging/{{ $user->uuid }}/create" class="btn btn-added">
+                            <img src="{{ asset('assets/dashboard/img/icons/plus.svg') }}" alt="img"
+                                class="me-1">Add Logging</a>
+                    </div>
                 </div>
 
                 @if (session()->has('success'))
