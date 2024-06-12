@@ -24,7 +24,7 @@ class LoggingFactory extends Factory
 
         return [
             'uuid' => Uuid::uuid4(),
-            'connection_uuid' => 'b232a817-7d12-48e7-8842-c7d23693ffee',
+            'connection_uuid' => null,
             'type' => $randomType,
             'data' => 'file excel data',
             'emergency' => 'file excel emergency',
