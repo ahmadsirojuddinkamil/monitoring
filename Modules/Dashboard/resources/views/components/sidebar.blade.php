@@ -86,7 +86,7 @@
                         @else
                             <li>
                                 <a href="/logging/{{ Auth::user()->uuid }}"
-                                    class="{{ Request::is('logging/' . Auth::user()->uuid . '*') ? 'active' : '' }}">
+                                    class="{{ Request::is('logging*') ? 'active' : '' }}">
                                     My Log
                                 </a>
                             </li>
