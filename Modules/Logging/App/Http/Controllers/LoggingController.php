@@ -77,4 +77,14 @@ class LoggingController extends Controller
             'connection' => $validationUser['user']->connection,
         ]);
     }
+
+    public function viewLogin()
+    {
+        return view('logging::layouts.login');
+    }
+
+    public function viewRegister()
+    {
+        return view('logging::layouts.register');
+    }
 }

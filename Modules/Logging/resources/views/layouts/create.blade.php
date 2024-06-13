@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="page-btn">
-                        <a href="" class="btn btn-added">
+                        <a href="/logging/login" class="btn btn-added">
                             <img src="{{ asset('assets/dashboard/img/icons/plus.svg') }}" alt="img"
                                 class="me-1">Login</a>
                     </div>
@@ -84,7 +84,7 @@
 
                                         <div class="col-lg-12 mt-3">
                                             <a data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                class="btn btn-submit me-2">Send</a>
+                                                class="btn btn-submit me-2">Submit</a>
 
                                             <div class="modal fade" id="exampleModal" tabindex="-1"
                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
