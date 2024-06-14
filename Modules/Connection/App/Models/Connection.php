@@ -29,6 +29,7 @@ class Connection extends Model
         'delete_log',
         'delete_log_by_type',
         'delete_log_by_time',
+        'token',
     ];
 
     // Factory
@@ -69,6 +70,7 @@ class Connection extends Model
             'delete_log' => $saveDataFromCall['delete_log'],
             'delete_log_by_type' => $saveDataFromCall['delete_log_by_type'],
             'delete_log_by_time' => $saveDataFromCall['delete_log_by_time'],
+            'token' => $saveDataFromCall['token'],
         ]);
     }
 
@@ -86,6 +88,7 @@ class Connection extends Model
             'delete_log' => $saveDataFromCall['delete_log'],
             'delete_log_by_type' => $saveDataFromCall['delete_log_by_type'],
             'delete_log_by_time' => $saveDataFromCall['delete_log_by_time'],
+            'token' => $saveDataFromCall['token'],
         ]);
     }
 }

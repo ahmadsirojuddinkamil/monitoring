@@ -54,8 +54,20 @@
                         @endif
 
                         <div class="row">
-                            <form action="" method="POST">
+                            <form action="/logging/register" method="POST">
                                 @csrf
+
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control" name="name"
+                                            placeholder="John Connor" required>
+                                    </div>
+
+                                    @error('name')
+                                        <div class="alert alert-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="form-group">
