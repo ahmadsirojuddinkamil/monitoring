@@ -3,8 +3,9 @@
 namespace Modules\Connection\App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class ConnectionRequest extends FormRequest
+class UpdateConnectionRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,7 +13,12 @@ class ConnectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'endpoint' => 'required|string',
+            // 'endpoint' => "required|string|unique:connections,endpoint,{$this->user()->connection->id}",
+            'endpoint' => [
+                'required',
+                'string',
+                Rule::unique('connections', 'endpoint')->ignore($this->user()->connection->id ?? null),
+            ],
             'register' => 'required|string',
             'login' => 'required|string',
             'get_log' => 'required|string',
@@ -21,6 +27,7 @@ class ConnectionRequest extends FormRequest
             'delete_log' => 'required|string',
             'delete_log_by_type' => 'required|string',
             'delete_log_by_time' => 'required|string',
+            'token' => 'required|string',
         ];
     }
 

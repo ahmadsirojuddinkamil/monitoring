@@ -8,6 +8,12 @@ class ConnectionService
     {
         $validateData = $saveDataFromCall;
 
+        if (! preg_match('/^[a-f0-9]{64}$/i', $validateData['token'])) {
+            return false;
+        }
+
+        unset($validateData['token']);
+
         $domains = [];
 
         foreach ($validateData as $key => $url) {
@@ -25,11 +31,11 @@ class ConnectionService
 
         $secretKeys = array_map(function ($url) {
             $path = ltrim(str_replace([
-                '/register-monitoring',
-                '/login-monitoring',
-                '/logging',
-                '/logging/KEY/type',
-                '/logging/KEY/type/time',
+                '/api/register-monitoring',
+                '/api/login-monitoring',
+                '/api/logging',
+                '/api/logging/KEY/type',
+                '/api/logging/KEY/type/time',
                 '/type',
                 '/time',
                 '/type/time',

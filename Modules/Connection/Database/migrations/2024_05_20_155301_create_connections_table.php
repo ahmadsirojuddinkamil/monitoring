@@ -24,6 +24,7 @@ return new class() extends Migration
             $table->string('delete_log');
             $table->string('delete_log_by_type');
             $table->string('delete_log_by_time');
+            $table->string('token')->nullable();
             $table->timestamps();
         });
     }

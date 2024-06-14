@@ -134,6 +134,15 @@
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
 
+                                <div class="mb-3">
+                                    <label for="token" class="form-label">Token</label>
+                                    <input type="text" class="form-control" id="token" name="token"
+                                        value="{{ $connection->token }}" required>
+                                </div>
+                                @error('token')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
+
                                 <div class="col-lg-12">
                                     <button type="button" class="btn btn-submit me-2" data-bs-toggle="modal"
                                         data-bs-target="#exampleModal">

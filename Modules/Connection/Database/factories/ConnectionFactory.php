@@ -21,14 +21,14 @@ class ConnectionFactory extends Factory
             'uuid' => Uuid::uuid4(),
             'user_uuid' => null,
             'endpoint' => 'https://endpoint.com/',
-            'register' => 'https://endpoint.com/register-monitoring/KEY',
-            'login' => 'https://endpoint.com/login-monitoring/KEY',
-            'get_log' => 'https://endpoint.com/logging/KEY',
-            'get_log_by_type' => 'https://endpoint.com/logging/KEY/type',
-            'get_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
-            'delete_log' => 'https://endpoint.com/logging/KEY',
-            'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
-            'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'register' => 'https://endpoint.com/api/register-monitoring/KEY',
+            'login' => 'https://endpoint.com/api/login-monitoring/KEY',
+            'get_log' => 'https://endpoint.com/api/logging/KEY',
+            'get_log_by_type' => 'https://endpoint.com/api/logging/KEY/type',
+            'get_log_by_time' => 'https://endpoint.com/api/logging/KEY/type/time',
+            'delete_log' => 'https://endpoint.com/api/logging/KEY',
+            'delete_log_by_type' => 'https://endpoint.com/api/logging/KEY/type',
+            'delete_log_by_time' => 'https://endpoint.com/api/logging/KEY/type/time',
         ];
     }
 }

@@ -52,7 +52,8 @@
 
                                 <div class="mb-3">
                                     <label for="endpoint" class="form-label">Endpoint</label>
-                                    <input type="text" class="form-control" id="endpoint" name="endpoint" required>
+                                    <input type="text" class="form-control" id="endpoint" name="endpoint"
+                                        placeholder="https://www.domain.com" required>
                                 </div>
                                 @error('endpoint')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -61,7 +62,7 @@
                                 <div class="mb-3">
                                     <label for="register" class="form-label">Register</label>
                                     <input type="text" class="form-control" id="register" name="register"
-                                        data-original-value="/register-monitoring/KEY" required>
+                                        data-original-value="/api/register-monitoring/KEY" required>
                                 </div>
                                 @error('register')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -70,7 +71,7 @@
                                 <div class="mb-3">
                                     <label for="login" class="form-label">Login</label>
                                     <input type="text" class="form-control" id="login" name="login"
-                                        data-original-value="/login-monitoring/KEY" required>
+                                        data-original-value="/api/login-monitoring/KEY" required>
                                 </div>
                                 @error('login')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -79,7 +80,7 @@
                                 <div class="mb-3">
                                     <label for="get_log" class="form-label">Get log</label>
                                     <input type="text" class="form-control" id="get_log" name="get_log"
-                                        data-original-value="/logging/KEY" required>
+                                        data-original-value="/api/logging/KEY" required>
                                 </div>
                                 @error('get_log')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -88,7 +89,7 @@
                                 <div class="mb-3">
                                     <label for="get_log_by_type" class="form-label">Get log by type</label>
                                     <input type="text" class="form-control" id="get_log_by_type"
-                                        name="get_log_by_type" data-original-value="/logging/KEY/type" required>
+                                        name="get_log_by_type" data-original-value="/api/logging/KEY/type" required>
                                 </div>
                                 @error('get_log_by_type')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -97,7 +98,8 @@
                                 <div class="mb-3">
                                     <label for="get_log_by_time" class="form-label">Get log by time</label>
                                     <input type="text" class="form-control" id="get_log_by_time"
-                                        name="get_log_by_time" data-original-value="/logging/KEY/type/time" required>
+                                        name="get_log_by_time" data-original-value="/api/logging/KEY/type/time"
+                                        required>
                                 </div>
                                 @error('get_log_by_time')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -106,7 +108,7 @@
                                 <div class="mb-3">
                                     <label for="delete_log" class="form-label">Delete log</label>
                                     <input type="text" class="form-control" id="delete_log" name="delete_log"
-                                        data-original-value="/logging/KEY" required>
+                                        data-original-value="/api/logging/KEY" required>
                                 </div>
                                 @error('delete_log')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -115,7 +117,7 @@
                                 <div class="mb-3">
                                     <label for="delete_log_by_type" class="form-label">Delete log by type</label>
                                     <input type="text" class="form-control" id="delete_log_by_type"
-                                        name="delete_log_by_type" data-original-value="/logging/KEY/type" required>
+                                        name="delete_log_by_type" data-original-value="/api/logging/KEY/type" required>
                                 </div>
                                 @error('delete_log_by_type')
                                     <div class="alert alert-danger">{{ $message }}</div>
@@ -124,10 +126,19 @@
                                 <div class="mb-3">
                                     <label for="delete_log_by_time" class="form-label">Delete log by time</label>
                                     <input type="text" class="form-control" id="delete_log_by_time"
-                                        name="delete_log_by_time" data-original-value="/logging/KEY/type/time"
+                                        name="delete_log_by_time" data-original-value="/api/logging/KEY/type/time"
                                         required>
                                 </div>
                                 @error('delete_log_by_time')
+                                    <div class="alert alert-danger">{{ $message }}</div>
+                                @enderror
+
+                                <div class="mb-3">
+                                    <label for="token" class="form-label">Token</label>
+                                    <input type="text" class="form-control" id="token" name="token"
+                                        required>
+                                </div>
+                                @error('token')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
 

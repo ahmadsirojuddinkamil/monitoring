@@ -25,14 +25,15 @@ class UpdateTest extends TestCase
 
         $response = $this->put("/connection/$connection->uuid", [
             'endpoint' => 'https://endpoint.com/',
-            'register' => "https://endpoint.com/register-monitoring/$key",
-            'login' => "https://endpoint.com/login-monitoring/$key",
-            'get_log' => "https://endpoint.com/logging/$key",
-            'get_log_by_type' => "https://endpoint.com/logging/$key/type",
-            'get_log_by_time' => "https://endpoint.com/logging/$key/type/time",
-            'delete_log' => "https://endpoint.com/logging/$key",
-            'delete_log_by_type' => "https://endpoint.com/logging/$key/type",
-            'delete_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+            'register' => "https://endpoint.com/api/register-monitoring/$key",
+            'login' => "https://endpoint.com/api/login-monitoring/$key",
+            'get_log' => "https://endpoint.com/api/logging/$key",
+            'get_log_by_type' => "https://endpoint.com/api/logging/$key/type",
+            'get_log_by_time' => "https://endpoint.com/api/logging/$key/type/time",
+            'delete_log' => "https://endpoint.com/api/logging/$key",
+            'delete_log_by_type' => "https://endpoint.com/api/logging/$key/type",
+            'delete_log_by_time' => "https://endpoint.com/api/logging/$key/type/time",
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
         $response->assertStatus(302);
         $response->assertRedirect('/connection/'.$user->uuid);
@@ -66,6 +67,7 @@ class UpdateTest extends TestCase
             'delete_log' => "https://endpoint.com/logging/$key",
             'delete_log_by_type' => "https://endpoint.com/logging/$key/type",
             'delete_log_by_time' => "https://endpoint.com/logging/$key/type/time",
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
         $response->assertStatus(404);
     }
@@ -111,6 +113,7 @@ class UpdateTest extends TestCase
             'delete_log' => 'https://endpoint.com/logging/KEY',
             'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
             'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
 
         $response->assertStatus(302);
@@ -139,6 +142,7 @@ class UpdateTest extends TestCase
             'delete_log' => 'https://endpoint.com/logging/KEY',
             'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
             'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
         $response->assertStatus(404);
     }
@@ -165,6 +169,7 @@ class UpdateTest extends TestCase
             'delete_log' => 'https://endpoint.com/logging/KEY',
             'delete_log_by_type' => 'https://endpoint.com/logging/KEY/type',
             'delete_log_by_time' => 'https://endpoint.com/logging/KEY/type/time',
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
         $response->assertStatus(404);
     }
@@ -189,6 +194,7 @@ class UpdateTest extends TestCase
             'delete_log' => 'https://client.com/logging/KEY',
             'delete_log_by_type' => 'https://client.com/logging/KEY/type',
             'delete_log_by_time' => 'https://client.com/logging/KEY/type/time',
+            'token' => '0b18b3ba1c9a99fd4cd3df8704aa57e63c28585b35d048305640d91a6f5db5a3',
         ]);
 
         $response->assertStatus(302);
