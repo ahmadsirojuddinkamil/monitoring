@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
 use Modules\Logging\App\Services\LoggingService;
 use Ramsey\Uuid\Uuid;
@@ -78,12 +79,40 @@ class LoggingController extends Controller
 
         return view('logging::layouts.create', [
             'connection' => $validationUser['user']->connection,
+            'token' => null,
         ]);
     }
 
     public function viewLogin()
     {
         return view('logging::layouts.login');
+    }
+
+    public function storeLogin(LoginLogRequest $request)
+    {
+        $validateData = $request->validated();
+
+        $client = new Client();
+        $connection = Auth::user()->connection;
+
+        try {
+            $client->post($connection->login, [
+                'headers' => [
+                    'Authorization' => 'Bearer '.$connection->token,
+                    'Accept' => 'application/json',
+                ],
+                'json' => $validateData,
+            ]);
+
+            return redirect('/logging/login')->with('success', 'Success login account connection!');
+        } catch (\GuzzleHttp\Exception\ClientException $error) {
+            $responseBody = json_decode($error->getResponse()->getBody(), true);
+            $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
+
+            return redirect('/logging/login')->with('error', $errorMessage);
+        } catch (\Exception $error) {
+            return redirect('/logging/login')->with('error', $error->getMessage());
+        }
     }
 
     public function viewRegister()
