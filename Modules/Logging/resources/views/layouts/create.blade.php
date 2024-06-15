@@ -40,6 +40,18 @@
 
                 <div class="card">
                     <div class="card-body">
+                        @if (session()->has('success'))
+                            <div class="alert alert-success d-flex justify-content-center" role="alert">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if (session()->has('error'))
+                            <div class="alert alert-danger d-flex justify-content-center" role="alert">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
                         <div class="requiredfield">
                             <h4>Choose your endpoints carefully! Any form of error whatsoever, is not our
                                 responsibility!</h4>
@@ -50,6 +62,8 @@
                             <div class="input-groupicon">
                                 <div class="form-group">
                                     <form action="" method="POST">
+                                        @csrf
+
                                         <select name="type" class="form-control text-center" name="endpoint"
                                             required>
                                             <option value="get_log">
@@ -79,7 +93,8 @@
 
                                         <div class="mt-3">
                                             <label for="token" class="form-label">Token</label>
-                                            <input type="text" class="form-control" id="token" required>
+                                            <input type="text" class="form-control" id="token"
+                                                value="{{ $token ? $token : '' }}" required>
                                         </div>
 
                                         <div class="col-lg-12 mt-3">

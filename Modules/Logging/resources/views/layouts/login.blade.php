@@ -54,7 +54,7 @@
                         @endif
 
                         <div class="row">
-                            <form action="" method="POST">
+                            <form action="/logging/login" method="POST">
                                 @csrf
 
                                 <div class="col-lg-6 col-sm-12">
