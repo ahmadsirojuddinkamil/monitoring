@@ -2,6 +2,7 @@
 
 namespace Modules\Logging\App\Services;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Modules\Connection\App\Models\Connection;
@@ -52,5 +53,44 @@ class LoggingService
         Logging::factory()->create([
             'connection_uuid' => $connection->uuid,
         ]);
+    }
+
+    public function endpointSelection($saveType)
+    {
+        $user = Auth::user();
+
+        $endpoints = [
+            'get_log' => $user->connection->get_log,
+            'get_log_by_type' => $user->connection->get_log_by_type,
+            'get_log_by_time' => $user->connection->get_log_by_time,
+            'delete_log' => $user->connection->delete_log,
+            'delete_log_by_type' => $user->connection->delete_log_by_type,
+            'delete_log_by_time' => $user->connection->delete_log_by_time,
+        ];
+
+        if (array_key_exists($saveType['type'], $endpoints)) {
+            return $endpoints[$saveType['type']];
+        } else {
+            return redirect("/logging/{$user->uuid}/create")->with('error', 'Type not found!');
+        }
+    }
+
+    public function fetchEndpoint($saveType, $saveToken, $saveEndpoint)
+    {
+        $client = new Client();
+
+        $method = in_array($saveType['type'], ['delete_log', 'delete_log_by_type', 'delete_log_by_time']) ? 'delete' : 'post';
+
+        $response = $client->$method($saveEndpoint, [
+            'headers' => [
+                'Authorization' => 'Bearer '.$saveToken,
+                'Accept' => 'application/json',
+            ],
+            'json' => $saveType,
+        ]);
+
+        $responseBody = json_decode($response->getBody(), true);
+
+        return $responseBody['data'];
     }
 }
