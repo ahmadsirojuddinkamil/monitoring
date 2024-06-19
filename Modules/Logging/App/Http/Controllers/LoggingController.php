@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
+use Modules\Logging\App\Http\Requests\StoreLogRequest;
 use Modules\Logging\App\Services\LoggingService;
+use Modules\Logging\Exports\ExportExcelLogging;
 use Ramsey\Uuid\Uuid;
 
 class LoggingController extends Controller
@@ -79,8 +83,39 @@ class LoggingController extends Controller
 
         return view('logging::layouts.create', [
             'connection' => $validationUser['user']->connection,
-            'token' => null,
         ]);
+    }
+
+    public function storeCreate(StoreLogRequest $request)
+    {
+        $jwtToken = $request->cookie('jwt_token', null);
+
+        if (! $jwtToken) {
+            return redirect('/logging/login')->with('error', 'You not logged in yet!');
+        }
+
+        $validateData = $request->validated();
+        $endpoint = $this->loggingService->endpointSelection($validateData);
+
+        try {
+            $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
+
+            $uniqueDir = 'get_log/'.Uuid::uuid4()->toString();
+            $fullPath = 'storage/'.$uniqueDir;
+            Storage::makeDirectory($fullPath);
+
+            $filePath = $uniqueDir.'/logging.xlsx';
+            ExportExcel::store(new ExportExcelLogging($logData), $filePath, 'public');
+
+            return $logData;
+        } catch (\GuzzleHttp\Exception\ClientException $error) {
+            $responseBody = json_decode($error->getResponse()->getBody(), true);
+            $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
+
+            return $errorMessage;
+        } catch (\Exception $error) {
+            return $error->getMessage();
+        }
     }
 
     public function viewLogin()
@@ -93,18 +128,23 @@ class LoggingController extends Controller
         $validateData = $request->validated();
 
         $client = new Client();
-        $connection = Auth::user()->connection;
+        $user = Auth::user();
 
         try {
-            $client->post($connection->login, [
+            $response = $client->post($user->connection->login, [
                 'headers' => [
-                    'Authorization' => 'Bearer '.$connection->token,
+                    'Authorization' => 'Bearer '.$user->connection->token,
                     'Accept' => 'application/json',
                 ],
                 'json' => $validateData,
             ]);
 
-            return redirect('/logging/login')->with('success', 'Success login account connection!');
+            $responseBody = json_decode($response->getBody(), true);
+            $jwtToken = $responseBody['data'];
+
+            return redirect("/logging/$user->uuid/create")
+                ->with('success', 'Success login account connection!')
+                ->cookie('jwt_token', $jwtToken, 60, null, null, false, true);
         } catch (\GuzzleHttp\Exception\ClientException $error) {
             $responseBody = json_decode($error->getResponse()->getBody(), true);
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';

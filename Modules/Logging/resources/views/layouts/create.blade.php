@@ -61,11 +61,10 @@
                             <label>Endpoint List</label>
                             <div class="input-groupicon">
                                 <div class="form-group">
-                                    <form action="" method="POST">
+                                    <form action="/logging/{{ Auth::user()->uuid }}/store" method="POST">
                                         @csrf
 
-                                        <select name="type" class="form-control text-center" name="endpoint"
-                                            required>
+                                        <select name="type" class="form-control text-center mb-3" required>
                                             <option value="get_log">
                                                 Get logging
                                             </option>
@@ -91,11 +90,9 @@
                                             </option>
                                         </select>
 
-                                        <div class="mt-3">
-                                            <label for="token" class="form-label">Token</label>
-                                            <input type="text" class="form-control" id="token"
-                                                value="{{ $token ? $token : '' }}" required>
-                                        </div>
+                                        @error('type')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
 
                                         <div class="col-lg-12 mt-3">
                                             <a data-bs-toggle="modal" data-bs-target="#exampleModal"
