@@ -2,9 +2,9 @@
 
 namespace Modules\Logging\Exports;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromArray;
 
-class ExportExcelLogging implements FromCollection
+class ExportExcelLogging implements FromArray
 {
     protected $logData;
 
@@ -13,18 +13,14 @@ class ExportExcelLogging implements FromCollection
         $this->logData = $logData;
     }
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    public function collection()
+    public function array(): array
     {
-        $formattedLogData = [];
-        foreach ($this->logData as $type => $logs) {
-            foreach ($logs as $log) {
-                $formattedLogData[] = [$type, $log];
-            }
+        $exportData = [];
+
+        foreach ($this->logData as $log) {
+            $exportData[] = [$log];
         }
 
-        return collect($formattedLogData);
+        return $exportData;
     }
 }
