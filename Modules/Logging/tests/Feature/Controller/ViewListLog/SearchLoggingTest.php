@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Logging\tests\Feature\Controller;
+namespace Modules\Logging\tests\Feature\Controller\ViewListLog;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
