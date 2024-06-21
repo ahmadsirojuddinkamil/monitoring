@@ -34,7 +34,7 @@ class LoggingController extends Controller
         $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
 
         return DB::transaction(function () use ($validationUser) {
-            $loggings = $validationUser['user']->connection->loggings()->latest()->paginate(10);
+            $loggings = $validationUser['user']->connection->loggings()->latest()->paginate(5);
 
             return view('logging::layouts.list', [
                 'user' => $validationUser['userAuth'],
@@ -98,18 +98,15 @@ class LoggingController extends Controller
         $validateData = $request->validated();
         $endpoint = $this->loggingService->endpointSelection($validateData);
 
-        // $destinationPath = public_path('public/get_log/385a3b5e-92ec-44a8-9340-8aa3021be6c7/testing/testing_debug.xlsx');
-        // $correctedPath = substr_replace($destinationPath, 'storage', strrpos($destinationPath, 'public'), strlen('public'));
-        // dd(file_exists($correctedPath));
-
         try {
-            $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
-
-            $primaryDir = 'public/get_log/'.Uuid::uuid4()->toString();
+            $primaryDir = "public/{$validateData['type']}/".Uuid::uuid4()->toString();
             Storage::makeDirectory($primaryDir);
 
             $directories = ['local', 'testing', 'production', 'other'];
             $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
+
+            $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
+            $ownerLog = Auth::user()->connection->uuid;
 
             foreach ($directories as $dir) {
                 $listPathGeneral = array_fill_keys($types, null);
@@ -119,20 +116,7 @@ class LoggingController extends Controller
                     $pathOther = "$primaryDir/other/other_{$uuid}.xlsx";
                     ExportExcel::store(new ExportExcelLogging($logData[$dir] ?? []), $pathOther);
 
-                    Logging::create([
-                        'uuid' => Uuid::uuid4(),
-                        'connection_uuid' => Auth::user()->connection->uuid,
-                        'type' => $dir,
-                        'data' => $pathOther,
-                        'info' => null,
-                        'emergency' => null,
-                        'alert' => null,
-                        'critical' => null,
-                        'error' => null,
-                        'warning' => null,
-                        'notice' => null,
-                        'debug' => null,
-                    ]);
+                    Logging::createLogging($dir, $pathOther, $listPathGeneral, $ownerLog);
                 } else {
                     Storage::makeDirectory("$primaryDir/$dir");
 
@@ -146,31 +130,18 @@ class LoggingController extends Controller
                         }
                     }
 
-                    Logging::create([
-                        'uuid' => Uuid::uuid4(),
-                        'connection_uuid' => Auth::user()->connection->uuid,
-                        'type' => $dir,
-                        'data' => null,
-                        'info' => $listPathGeneral['info'],
-                        'emergency' => $listPathGeneral['emergency'],
-                        'alert' => $listPathGeneral['alert'],
-                        'critical' => $listPathGeneral['critical'],
-                        'error' => $listPathGeneral['error'],
-                        'warning' => $listPathGeneral['warning'],
-                        'notice' => $listPathGeneral['notice'],
-                        'debug' => $listPathGeneral['debug'],
-                    ]);
+                    Logging::createLogging($dir, null, $listPathGeneral, $ownerLog);
                 }
             }
 
-            return $logData;
+            return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully connect to the endpoint');
         } catch (\GuzzleHttp\Exception\ClientException $error) {
             $responseBody = json_decode($error->getResponse()->getBody(), true);
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
 
-            return $errorMessage;
+            return redirect('/logging/'.Auth::user()->uuid)->with('error', $errorMessage);
         } catch (\Exception $error) {
-            return $error->getMessage();
+            return redirect('/logging/'.Auth::user()->uuid)->with('error', $error->getMessage());
         }
     }
 
@@ -200,7 +171,7 @@ class LoggingController extends Controller
 
             return redirect("/logging/$user->uuid/create")
                 ->with('success', 'Success login account connection!')
-                ->cookie('jwt_token', $jwtToken, 600, null, null, false, true);
+                ->cookie('jwt_token', $jwtToken, 60, null, null, false, true);
         } catch (\GuzzleHttp\Exception\ClientException $error) {
             $responseBody = json_decode($error->getResponse()->getBody(), true);
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
