@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Logging\tests\Feature\Controller\Register;
+namespace Modules\Logging\tests\Feature\Controller\Login;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Logging\App\Services\LoggingService;
 use Modules\User\App\Models\User;
 use Tests\TestCase;
 
-class ViewRegisterLoggingTest extends TestCase
+class ViewLoginLoggingTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -19,33 +19,33 @@ class ViewRegisterLoggingTest extends TestCase
         $this->logging = new LoggingService();
     }
 
-    public function test_view_register_account_log_success_displayed(): void
+    public function test_view_login_account_log_success_displayed(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $this->logging->generateConnectionLog($user);
 
-        $response = $this->get('/logging/register');
+        $response = $this->get('/logging/login');
         $response->assertStatus(200);
-        $response->assertSeeText('After registering you can immediately login, to get a token!');
+        $response->assertSeeText('Login immediately to get tokens!');
     }
 
-    public function test_view_register_account_log_failed_because_not_login(): void
+    public function test_view_login_account_log_failed_because_not_login(): void
     {
-        $response = $this->get('/logging/register');
+        $response = $this->get('/logging/login');
         $response->assertStatus(302);
         $response->assertRedirect('/login');
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('You must log in first!', session('error'));
     }
 
-    public function test_view_register_account_log_failed_because_connection_not_found(): void
+    public function test_view_login_account_log_failed_because_connection_not_found(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->get('/logging/register');
+        $response = $this->get('/logging/login');
         $response->assertStatus(302);
         $response->assertRedirect("connection/$user->uuid");
         $this->assertTrue(session()->has('error'));
