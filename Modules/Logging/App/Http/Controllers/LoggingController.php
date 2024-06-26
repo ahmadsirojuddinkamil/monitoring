@@ -3,9 +3,9 @@
 namespace Modules\Logging\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
@@ -135,8 +135,8 @@ class LoggingController extends Controller
             }
 
             return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully connect to the endpoint');
-        } catch (\GuzzleHttp\Exception\ClientException $error) {
-            $responseBody = json_decode($error->getResponse()->getBody(), true);
+        } catch (\Illuminate\Http\Client\RequestException $error) {
+            $responseBody = $error->response->json();
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
 
             return redirect('/logging/'.Auth::user()->uuid)->with('error', $errorMessage);
@@ -153,18 +153,15 @@ class LoggingController extends Controller
     public function storeLogin(LoginLogRequest $request)
     {
         $validateData = $request->validated();
-
-        $client = new Client();
         $user = Auth::user();
 
         try {
-            $response = $client->post($user->connection->login, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$user->connection->token,
-                    'Accept' => 'application/json',
-                ],
-                'json' => $validateData,
-            ]);
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer '.$user->connection->token,
+                'Accept' => 'application/json',
+            ])->post($user->connection->login, $validateData);
+
+            $response->throw();
 
             $responseBody = json_decode($response->getBody(), true);
             $jwtToken = $responseBody['data'];
@@ -172,8 +169,8 @@ class LoggingController extends Controller
             return redirect("/logging/$user->uuid/create")
                 ->with('success', 'Success login account connection!')
                 ->cookie('jwt_token', $jwtToken, 60, null, null, false, true);
-        } catch (\GuzzleHttp\Exception\ClientException $error) {
-            $responseBody = json_decode($error->getResponse()->getBody(), true);
+        } catch (\Illuminate\Http\Client\RequestException $error) {
+            $responseBody = $error->response->json();
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
 
             return redirect('/logging/login')->with('error', $errorMessage);
@@ -190,22 +187,19 @@ class LoggingController extends Controller
     public function storeRegister(RegisterLogRequest $request)
     {
         $validateData = $request->validated();
-
-        $client = new Client();
         $connection = Auth::user()->connection;
 
         try {
-            $client->post($connection->register, [
-                'headers' => [
-                    'Authorization' => 'Bearer '.$connection->token,
-                    'Accept' => 'application/json',
-                ],
-                'json' => $validateData,
-            ]);
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer '.$connection->token,
+                'Accept' => 'application/json',
+            ])->post($connection->register, $validateData);
+
+            $response->throw();
 
             return redirect('/logging/login')->with('success', 'Success register account connection! Login now');
-        } catch (\GuzzleHttp\Exception\ClientException $error) {
-            $responseBody = json_decode($error->getResponse()->getBody(), true);
+        } catch (\Illuminate\Http\Client\RequestException $error) {
+            $responseBody = $error->response->json();
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
 
             return redirect('/logging/register')->with('error', $errorMessage);
