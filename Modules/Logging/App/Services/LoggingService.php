@@ -2,8 +2,8 @@
 
 namespace Modules\Logging\App\Services;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use Modules\Connection\App\Models\Connection;
 use Modules\Logging\App\Models\Logging;
@@ -77,20 +77,19 @@ class LoggingService
 
     public function fetchEndpoint($saveType, $saveToken, $saveEndpoint)
     {
-        $client = new Client();
-
         $method = in_array($saveType['type'], ['delete_log', 'delete_log_by_type', 'delete_log_by_time']) ? 'delete' : 'post';
 
-        $response = $client->$method($saveEndpoint, [
-            'headers' => [
-                'Authorization' => 'Bearer '.$saveToken,
-                'Accept' => 'application/json',
-            ],
-            'json' => $saveType,
-        ]);
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.$saveToken,
+            'Accept' => 'application/json',
+        ])->$method($saveEndpoint, $saveType);
 
         $responseBody = json_decode($response->getBody(), true);
 
-        return $responseBody['data'];
+        if (isset($responseBody['data'])) {
+            return $responseBody['data'];
+        } elseif (isset($responseBody['error'])) {
+            throw new \Exception($responseBody['error']);
+        }
     }
 }
