@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
@@ -99,13 +100,19 @@ class LoggingController extends Controller
         $endpoint = $this->loggingService->endpointSelection($validateData);
 
         try {
-            $primaryDir = "public/{$validateData['type']}/".Uuid::uuid4()->toString();
+            $uuidDirectory = Uuid::uuid4()->toString();
+            $primaryDir = "public/{$validateData['type']}/".$uuidDirectory;
             Storage::makeDirectory($primaryDir);
+
+            if (app()->environment('testing')) {
+                Log::info("directory testing, $uuidDirectory");
+            }
 
             $directories = ['local', 'testing', 'production', 'other'];
             $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
 
             $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
+
             $ownerLog = Auth::user()->connection->uuid;
 
             foreach ($directories as $dir) {
@@ -134,7 +141,7 @@ class LoggingController extends Controller
                 }
             }
 
-            return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully connect to the endpoint');
+            return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');
         } catch (\Illuminate\Http\Client\RequestException $error) {
             $responseBody = $error->response->json();
             $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
