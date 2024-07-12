@@ -8,7 +8,7 @@
     <meta name="keywords"
         content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
     <meta name="robots" content="noindex, nofollow">
-    <title>Loggingpedia | create logging</title>
+    <title>Loggingpedia | fetch log</title>
 
     @include('dashboard::bases.css')
 </head>
@@ -64,35 +64,61 @@
                                     <form action="/logging/{{ Auth::user()->uuid }}/store" method="POST">
                                         @csrf
 
-                                        <select name="type" class="form-control text-center mb-3" required>
-                                            <option value="get_log">
-                                                Get logging
-                                            </option>
-
-                                            <option value="get_log_by_type">
-                                                Get logging by type
-                                            </option>
-
-                                            <option value="get_log_by_time">
-                                                Get logging by time
-                                            </option>
-
-                                            <option value="delete_log">
-                                                Delete logging
-                                            </option>
-
-                                            <option value="delete_log_by_type">
-                                                Delete logging by type
-                                            </option>
-
-                                            <option value="delete_log_by_time">
-                                                Delete logging by time
-                                            </option>
+                                        <select name="type" id="logTypeSelect" class="form-control text-center mb-3"
+                                            required>
+                                            <option value="get_log">Get logging</option>
+                                            <option value="get_log_by_type">Get logging by type</option>
+                                            <option value="get_log_by_time">Get logging by time</option>
+                                            <option value="delete_log">Delete logging</option>
+                                            <option value="delete_log_by_type">Delete logging by type</option>
+                                            <option value="delete_log_by_time">Delete logging by time</option>
                                         </select>
 
                                         @error('type')
                                             <div class="alert alert-danger">{{ $message }}</div>
                                         @enderror
+
+                                        <div id="additionalInput" class="mb-3" style="display: none;">
+                                            <label for="logType">Log Type:</label>
+                                            <select name="type_env" id="logType" class="form-control text-center">
+                                                <option value="">Choose type log</option>
+                                                <option value="local">Local</option>
+                                                <option value="testing">Testing</option>
+                                                <option value="production">Production</option>
+                                            </select>
+                                        </div>
+
+                                        @error('type_env')
+                                            <div class="alert alert-danger">{{ $message }}</div>
+                                        @enderror
+
+                                        <div class="d-flex justify-content-between">
+                                            <div id="InputTimeStart" class="col-lg col-sm-6 col-12 me-2"
+                                                style="display: none;">
+                                                <div class="form-group">
+                                                    <label class="form-label">Start time</label>
+                                                    <input type="datetime-local" name="time_start" class="form-control"
+                                                        step="1" value="{{ request('time_start') }}">
+                                                </div>
+
+                                                @error('time_start')
+                                                    <div class="alert alert-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div id="InputTimeEnd" class="col-lg col-sm-6 col-12"
+                                                style="display: none;">
+                                                <div class="form-group">
+                                                    <label class="form-label">End time</label>
+                                                    <input type="datetime-local" name="time_end" class="form-control"
+                                                        step="1" value="{{ request('time_end') }}">
+                                                </div>
+
+                                                @error('time_end')
+                                                    <div class="alert alert-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
 
                                         <div class="col-lg-12 mt-3">
                                             <a data-bs-toggle="modal" data-bs-target="#exampleModal"
@@ -103,8 +129,8 @@
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLabel">Are you
-                                                                sure?</h5>
+                                                            <h5 class="modal-title" id="exampleModalLabel">Are you sure?
+                                                            </h5>
                                                             <button type="button" class="btn-close"
                                                                 data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
@@ -116,11 +142,8 @@
                                                         <div class="modal-footer d-flex justify-content-end">
                                                             <button type="button" class="btn btn-secondary"
                                                                 data-bs-dismiss="modal">No</button>
-
-                                                            <form action="" method="POST" class="action-form">
-                                                                <button type="submit"
-                                                                    class="btn btn-submit me-2">Yes</button>
-                                                            </form>
+                                                            <button type="submit"
+                                                                class="btn btn-submit me-2">Yes</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -130,6 +153,50 @@
                                                 class="btn btn-cancel">Cancel</a>
                                         </div>
                                     </form>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            const logTypeSelect = document.getElementById('logTypeSelect');
+                                            const additionalInput = document.getElementById('additionalInput');
+                                            const inputTimeStart = document.getElementById('InputTimeStart');
+                                            const inputTimeEnd = document.getElementById('InputTimeEnd');
+                                            const timeStartInput = document.querySelector('input[name="time_start"]');
+                                            const timeEndInput = document.querySelector('input[name="time_end"]');
+                                            const logType = document.getElementById('logType');
+
+                                            // Set default values on page load
+                                            logTypeSelect.value = 'get_log';
+                                            logType.value = '';
+
+                                            // Reset time inputs
+                                            timeStartInput.value = '';
+                                            timeEndInput.value = '';
+
+                                            logTypeSelect.addEventListener('change', function() {
+                                                const selectedValue = logTypeSelect.value;
+
+                                                if (selectedValue === 'get_log_by_type' || selectedValue === 'delete_log_by_type') {
+                                                    additionalInput.style.display = 'block';
+                                                    inputTimeStart.style.display = 'none';
+                                                    inputTimeEnd.style.display = 'none';
+                                                    timeStartInput.removeAttribute('required');
+                                                    timeEndInput.removeAttribute('required');
+                                                } else if (selectedValue === 'get_log_by_time' || selectedValue === 'delete_log_by_time') {
+                                                    additionalInput.style.display = 'block';
+                                                    inputTimeStart.style.display = 'block';
+                                                    inputTimeEnd.style.display = 'block';
+                                                    timeStartInput.setAttribute('required', 'required');
+                                                    timeEndInput.setAttribute('required', 'required');
+                                                } else {
+                                                    additionalInput.style.display = 'none';
+                                                    inputTimeStart.style.display = 'none';
+                                                    inputTimeEnd.style.display = 'none';
+                                                    timeStartInput.removeAttribute('required');
+                                                    timeEndInput.removeAttribute('required');
+                                                }
+                                            });
+                                        });
+                                    </script>
                                 </div>
                             </div>
                         </div>

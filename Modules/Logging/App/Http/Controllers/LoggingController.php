@@ -8,13 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
 use Modules\Logging\App\Http\Requests\StoreLogRequest;
-use Modules\Logging\App\Models\Logging;
 use Modules\Logging\App\Services\LoggingService;
-use Modules\Logging\Exports\ExportExcelLogging;
 use Ramsey\Uuid\Uuid;
 
 class LoggingController extends Controller
@@ -112,33 +109,12 @@ class LoggingController extends Controller
             $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
 
             $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
-
             $ownerLog = Auth::user()->connection->uuid;
 
-            foreach ($directories as $dir) {
-                $listPathGeneral = array_fill_keys($types, null);
-
-                if ($dir == 'other') {
-                    $uuid = Uuid::uuid4()->toString();
-                    $pathOther = "$primaryDir/other/other_{$uuid}.xlsx";
-                    ExportExcel::store(new ExportExcelLogging($logData[$dir] ?? []), $pathOther);
-
-                    Logging::createLogging($dir, $pathOther, $listPathGeneral, $ownerLog);
-                } else {
-                    Storage::makeDirectory("$primaryDir/$dir");
-
-                    foreach ($types as $type) {
-                        if (isset($logData[$dir][$type])) {
-                            $uuid = Uuid::uuid4()->toString();
-                            $pathGeneral = "$primaryDir/$dir/{$dir}_{$type}_{$uuid}.xlsx";
-                            ExportExcel::store(new ExportExcelLogging($logData[$dir][$type]), $pathGeneral);
-
-                            $listPathGeneral[$type] = $pathGeneral;
-                        }
-                    }
-
-                    Logging::createLogging($dir, null, $listPathGeneral, $ownerLog);
-                }
+            if ($validateData['type_env'] == null && $validateData['time_start'] == null && $validateData['time_end'] == null) {
+                $this->loggingService->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
+            } elseif ($validateData['type_env'] && $validateData['time_start'] == null && $validateData['time_end'] == null) {
+                $this->loggingService->generateExportGetLogByType($validateData, $logData, $primaryDir);
             }
 
             return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');
