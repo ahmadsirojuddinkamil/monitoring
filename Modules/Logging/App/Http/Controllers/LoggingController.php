@@ -111,10 +111,16 @@ class LoggingController extends Controller
             $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
             $ownerLog = Auth::user()->connection->uuid;
 
-            if ($validateData['type_env'] == null && $validateData['time_start'] == null && $validateData['time_end'] == null) {
+            $payload = [
+                'type_env' => $validateData['type_env'] ?? null,
+                'time_start' => $validateData['time_start'] ?? null,
+                'time_end' => $validateData['time_end'] ?? null,
+            ];
+
+            if ($payload['type_env'] == null && $payload['time_start'] == null && $payload['time_end'] == null) {
                 $this->loggingService->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
-            } elseif ($validateData['type_env'] && $validateData['time_start'] == null && $validateData['time_end'] == null) {
-                $this->loggingService->generateExportGetLogByType($validateData, $logData, $primaryDir);
+            } elseif ($payload['type_env'] && $payload['time_start'] == null && $payload['time_end'] == null) {
+                $this->loggingService->generateExportGetLogByType($validateData, $logData, $primaryDir, $ownerLog, $types);
             }
 
             return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');
