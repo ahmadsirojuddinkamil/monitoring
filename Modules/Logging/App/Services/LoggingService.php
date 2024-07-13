@@ -83,21 +83,18 @@ class LoggingService
     {
         $method = in_array($saveType['type'], ['delete_log', 'delete_log_by_type', 'delete_log_by_time']) ? 'delete' : 'post';
 
-        $headers = [
+        $payload = [
+            'type_env' => $saveType['type_env'] ?? null,
+            'time_start' => $saveType['time_start'] ?? null,
+            'time_end' => $saveType['time_end'] ?? null,
+        ];
+
+        $filteredPayload = array_filter($payload, fn ($value) => ! is_null($value));
+
+        $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$saveToken,
             'Accept' => 'application/json',
-        ];
-
-        $requestData = [
-            'type_env' => $saveType['type_env'],
-        ];
-
-        if ($saveType['time_start'] && $saveType['time_end']) {
-            $requestData['time_start'] = $saveType['time_start'];
-            $requestData['time_end'] = $saveType['time_end'];
-        }
-
-        $response = Http::withHeaders($headers)->$method($saveEndpoint, $requestData);
+        ])->$method($saveEndpoint, $filteredPayload ?: $saveType);
 
         $responseBody = json_decode($response->getBody(), true);
 
@@ -127,7 +124,6 @@ class LoggingService
                         $uuid = Uuid::uuid4()->toString();
                         $pathGeneral = "$primaryDir/$dir/{$dir}_{$type}_{$uuid}.xlsx";
                         ExportExcel::store(new ExportExcelLogging($logData[$dir][$type]), $pathGeneral);
-
                         $listPathGeneral[$type] = $pathGeneral;
                     }
                 }
@@ -137,16 +133,29 @@ class LoggingService
         }
     }
 
-    public function generateExportGetLogByType($validateData, $logData, $primaryDir)
+    public function generateExportGetLogByType($validateData, $logData, $primaryDir, $ownerLog, $types)
     {
-        $typeEnv = $validateData['type_env'];
-        $keyNames = array_keys($logData[$typeEnv]);
-        Storage::makeDirectory("$primaryDir/$typeEnv");
+        try {
+            $typeEnv = $validateData['type_env'];
+            $keyNames = array_keys($logData[$typeEnv]);
+            $directoryCreated = Storage::makeDirectory("$primaryDir/$typeEnv");
 
-        foreach ($keyNames as $typeName) {
-            $uuid = Uuid::uuid4()->toString();
-            $pathGeneral = "$primaryDir/$typeEnv/{$typeName}_{$uuid}.xlsx";
-            ExportExcel::store(new ExportExcelLogging($logData[$typeEnv][$typeName]), $pathGeneral);
+            if ($directoryCreated) {
+                $listPathGeneral = array_fill_keys($types, null);
+
+                foreach ($keyNames as $typeName) {
+                    $uuid = Uuid::uuid4()->toString();
+                    $pathGeneral = "$primaryDir/$typeEnv/{$typeName}_{$uuid}.xlsx";
+                    ExportExcel::store(new ExportExcelLogging($logData[$typeEnv][$typeName]), $pathGeneral);
+                    $listPathGeneral[$typeName] = $pathGeneral;
+                }
+
+                Logging::createLogging($typeEnv, null, $listPathGeneral, $ownerLog);
+            } else {
+                throw new \Exception();
+            }
+        } catch (\Exception $error) {
+            return redirect('logging/'.Auth::user()->uuid.'/create')->with('error', 'Failed to create directory or export logs.');
         }
     }
 }

@@ -139,6 +139,13 @@ class FetchLogErrorTest extends TestCase
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Invalid JWT format!', session('error'));
 
+        $logPath = storage_path('logs/laravel.log');
+        $logContents = file_get_contents($logPath);
+        preg_match('/directory testing, ([a-f0-9\-]+)/', $logContents, $matches);
+        $uuidFromLog = $matches[1] ?? null;
+        $this->assertNotNull($uuidFromLog);
+        Storage::deleteDirectory("public/get_log/{$uuidFromLog}");
+        file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
     }
 
     public function test_fetch_get_log_failed_because_token_is_expired(): void

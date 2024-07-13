@@ -43,21 +43,21 @@ class Logging extends Model
     }
 
     // Query
-    public static function createLogging($saveDir, $saveOther, $saveGeneral, $saveOwnerLog)
+    public static function createLogging($saveDir, $saveOther, $savePath, $saveOwnerLog)
     {
         return self::create([
             'uuid' => Uuid::uuid4(),
             'connection_uuid' => $saveOwnerLog,
             'type' => $saveDir,
             'data' => $saveOther ?? null,
-            'info' => $saveGeneral['info'] ?? null,
-            'emergency' => $saveGeneral['emergency'] ?? null,
-            'alert' => $saveGeneral['alert'] ?? null,
-            'critical' => $saveGeneral['critical'] ?? null,
-            'error' => $saveGeneral['error'] ?? null,
-            'warning' => $saveGeneral['warning'] ?? null,
-            'notice' => $saveGeneral['notice'] ?? null,
-            'debug' => $saveGeneral['debug'] ?? null,
+            'info' => $savePath['info'] ?? null,
+            'emergency' => $savePath['emergency'] ?? null,
+            'alert' => $savePath['alert'] ?? null,
+            'critical' => $savePath['critical'] ?? null,
+            'error' => $savePath['error'] ?? null,
+            'warning' => $savePath['warning'] ?? null,
+            'notice' => $savePath['notice'] ?? null,
+            'debug' => $savePath['debug'] ?? null,
         ]);
     }
 }
