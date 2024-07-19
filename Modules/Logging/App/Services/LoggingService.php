@@ -133,7 +133,7 @@ class LoggingService
         }
     }
 
-    public function generateExportGetLogByType($validateData, $logData, $primaryDir, $ownerLog, $types)
+    public function generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types)
     {
         try {
             $typeEnv = $validateData['type_env'];
