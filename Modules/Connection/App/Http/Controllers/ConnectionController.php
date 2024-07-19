@@ -3,7 +3,8 @@
 namespace Modules\Connection\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Connection\App\Http\Requests\ConnectionRequest;
+use Modules\Connection\App\Http\Requests\StoreConnectionRequest;
+use Modules\Connection\App\Http\Requests\UpdateConnectionRequest;
 use Modules\Connection\App\Models\Connection;
 use Modules\Connection\App\Services\ConnectionService;
 use Modules\User\App\Models\User;
@@ -26,13 +27,10 @@ class ConnectionController extends Controller
     {
         $this->userService->checkUserNotHaveConnection();
 
-        // $uniqueId = Str::random(16);
-        // dd($uniqueId);
-
         return view('connection::layouts.create');
     }
 
-    public function store(ConnectionRequest $request)
+    public function store(StoreConnectionRequest $request)
     {
         $this->userService->checkUserNotHaveConnection();
 
@@ -136,7 +134,7 @@ class ConnectionController extends Controller
         ]);
     }
 
-    public function update(ConnectionRequest $request, $saveUuidFromCall)
+    public function update(UpdateConnectionRequest $request, $saveUuidFromCall)
     {
         $this->userService->checkUserHaveConnection();
 

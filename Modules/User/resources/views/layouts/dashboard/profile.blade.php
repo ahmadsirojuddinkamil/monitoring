@@ -7,7 +7,6 @@
     <meta name="description" content="POS - Bootstrap Admin Template">
     <meta name="keywords"
         content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
-    <meta name="author" content="Dreamguys - Bootstrap Admin Template">
     <meta name="robots" content="noindex, nofollow">
     <title>Loggingpedia | profile {{ $user->username }}</title>
 

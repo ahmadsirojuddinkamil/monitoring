@@ -3,7 +3,7 @@ name: ContinuousIntegration
 on:
   push:
     branches:
-      - feature_01_connection
+      - feature-02-logging
   pull_request:
     branches:
       - master
@@ -20,8 +20,8 @@ jobs:
       - name: Build Apps
         run: composer install
 
-      # - name: Generate Storage Testing
-      #   run: php artisan storage:link
+      - name: Generate Storage Testing
+        run: php artisan storage:link
 
       # - name: Generate Environment Testing
       #   run: cp .env.example .env.testing

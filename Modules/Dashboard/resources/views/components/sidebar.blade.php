@@ -77,16 +77,17 @@
                     </a>
 
                     <ul>
-                        <li>
-                            <a href="" class="{{ Request::is('') ? 'active' : '' }}">
-                                My Log
-                            </a>
-                        </li>
-
                         @if (Auth::user()->hasRole('administrator'))
                             <li>
                                 <a href="" class="{{ Request::is('') ? 'active' : '' }}">
-                                    Loggings List
+                                    Logging List
+                                </a>
+                            </li>
+                        @else
+                            <li>
+                                <a href="/logging/{{ Auth::user()->uuid }}"
+                                    class="{{ Request::is('logging*') ? 'active' : '' }}">
+                                    My Log
                                 </a>
                             </li>
                         @endif

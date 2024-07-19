@@ -18,6 +18,10 @@ return new class() extends Migration
         Schema::table('connections', function (Blueprint $table) {
             $table->foreign('user_uuid')->references('uuid')->on('users')->onDelete('cascade');
         });
+
+        Schema::table('loggings', function (Blueprint $table) {
+            $table->foreign('connection_uuid')->references('uuid')->on('connections')->onDelete('cascade');
+        });
     }
 
     /**

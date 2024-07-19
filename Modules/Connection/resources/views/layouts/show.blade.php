@@ -130,6 +130,13 @@
                                                 <h6>{{ $connection->delete_log_by_time }}</h6>
                                             @endif
                                         </li>
+
+                                        <li>
+                                            <h4>Token</h4>
+                                            @if ($connection)
+                                                <h6>{{ $connection->token }}</h6>
+                                            @endif
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

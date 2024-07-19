@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Connection\Database\factories\ClientConnectionFactory;
 use Modules\Connection\Database\factories\ConnectionFactory;
+use Modules\Logging\App\Models\Logging;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
 
@@ -28,6 +29,7 @@ class Connection extends Model
         'delete_log',
         'delete_log_by_type',
         'delete_log_by_time',
+        'token',
     ];
 
     // Factory
@@ -48,6 +50,11 @@ class Connection extends Model
         return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
+    public function loggings()
+    {
+        return $this->hasMany(Logging::class, 'connection_uuid', 'uuid');
+    }
+
     // Query
     public static function createConnection($saveUuidFromCall, $saveDataFromCall)
     {
@@ -63,6 +70,7 @@ class Connection extends Model
             'delete_log' => $saveDataFromCall['delete_log'],
             'delete_log_by_type' => $saveDataFromCall['delete_log_by_type'],
             'delete_log_by_time' => $saveDataFromCall['delete_log_by_time'],
+            'token' => $saveDataFromCall['token'],
         ]);
     }
 
@@ -80,6 +88,7 @@ class Connection extends Model
             'delete_log' => $saveDataFromCall['delete_log'],
             'delete_log_by_type' => $saveDataFromCall['delete_log_by_type'],
             'delete_log_by_time' => $saveDataFromCall['delete_log_by_time'],
+            'token' => $saveDataFromCall['token'],
         ]);
     }
 }

@@ -7,7 +7,7 @@ composer require nwidart/laravel-modules
     - Connection
 
 composer require guzzlehttp/guzzle
-    - Connection
+    - Logging
 
 composer require spatie/laravel-permission
     "autoload": {
@@ -33,3 +33,6 @@ composer require spatie/laravel-permission
     - Dashboard
     - Logging
     - Connection
+
+composer require maatwebsite/excel:^3.1
+    - Logging
