@@ -108,4 +108,50 @@ class FetchLogTest extends TestCase
         Storage::deleteDirectory("public/get_log_by_type/{$uuidFromLog}");
         file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
     }
+
+    public function test_fetch_get_log_by_time_success(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Connection::factory()->create([
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+        $endpoint = 'https://endpoint.com/api/logging/082534e1184185f7cd56287a6d6b0864d0274c4d33d5629ebb21a064987977d3/type/time';
+
+        Http::fake([
+            $endpoint => Http::response([
+                'data' => [
+                    'testing' => [
+                        'info' => [
+                            '[2024-07-10 07:31:25] testing.INFO: Success get log by time',
+                        ],
+                    ],
+                ],
+            ], 200, ['Authorization' => 'Bearer '.$jwtToken]),
+        ]);
+
+        $response = $this->withCookie('jwt_token', $jwtToken)->post("/logging/$user->uuid/store", [
+            'type' => 'get_log_by_type',
+            'type_env' => 'testing',
+            'time_start' => '2024-07-01T11:11:11',
+            'time_end' => '2024-07-31T22:22:22',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect("/logging/$user->uuid");
+        $this->assertTrue(session()->has('success'));
+        $this->assertEquals('Successfully perform log operations', session('success'));
+
+        $logPath = storage_path('logs/laravel.log');
+        $logContents = file_get_contents($logPath);
+        preg_match('/directory testing, ([a-f0-9\-]+)/', $logContents, $matches);
+        $uuidFromLog = $matches[1] ?? null;
+        $this->assertNotNull($uuidFromLog);
+        Storage::deleteDirectory("public/get_log_by_time/{$uuidFromLog}");
+        file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
+    }
 }
