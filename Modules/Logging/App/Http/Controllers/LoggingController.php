@@ -108,19 +108,21 @@ class LoggingController extends Controller
             $directories = ['local', 'testing', 'production', 'other'];
             $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
 
-            $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
-            $ownerLog = Auth::user()->connection->uuid;
-
             $payload = [
                 'type_env' => $validateData['type_env'] ?? null,
                 'time_start' => $validateData['time_start'] ?? null,
                 'time_end' => $validateData['time_end'] ?? null,
             ];
 
+            $ownerLog = Auth::user()->connection->uuid;
+            $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
+
             if ($payload['type_env'] == null && $payload['time_start'] == null && $payload['time_end'] == null) {
                 $this->loggingService->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
             } elseif ($payload['type_env'] && $payload['time_start'] == null && $payload['time_end'] == null) {
-                $this->loggingService->generateExportGetLogByType($validateData, $logData, $primaryDir, $ownerLog, $types);
+                $this->loggingService->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
+            } elseif ($payload['type_env'] && $payload['time_start'] && $payload['time_end']) {
+                $this->loggingService->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
             }
 
             return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');

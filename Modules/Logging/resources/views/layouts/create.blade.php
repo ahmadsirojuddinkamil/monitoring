@@ -164,11 +164,8 @@
                                             const timeEndInput = document.querySelector('input[name="time_end"]');
                                             const logType = document.getElementById('logType');
 
-                                            // Set default values on page load
                                             logTypeSelect.value = 'get_log';
                                             logType.value = '';
-
-                                            // Reset time inputs
                                             timeStartInput.value = '';
                                             timeEndInput.value = '';
 
@@ -179,18 +176,24 @@
                                                     additionalInput.style.display = 'block';
                                                     inputTimeStart.style.display = 'none';
                                                     inputTimeEnd.style.display = 'none';
-                                                    timeStartInput.removeAttribute('required');
-                                                    timeEndInput.removeAttribute('required');
+                                                    timeStartInput.value = '';
+                                                    timeEndInput.value = '';
+                                                    logType.setAttribute('required', 'required');
                                                 } else if (selectedValue === 'get_log_by_time' || selectedValue === 'delete_log_by_time') {
                                                     additionalInput.style.display = 'block';
                                                     inputTimeStart.style.display = 'block';
                                                     inputTimeEnd.style.display = 'block';
+                                                    logType.setAttribute('required', 'required');
                                                     timeStartInput.setAttribute('required', 'required');
                                                     timeEndInput.setAttribute('required', 'required');
                                                 } else {
+                                                    logType.value = '';
+                                                    timeStartInput.value = '';
+                                                    timeEndInput.value = '';
                                                     additionalInput.style.display = 'none';
                                                     inputTimeStart.style.display = 'none';
                                                     inputTimeEnd.style.display = 'none';
+                                                    logType.removeAttribute('required');
                                                     timeStartInput.removeAttribute('required');
                                                     timeEndInput.removeAttribute('required');
                                                 }
