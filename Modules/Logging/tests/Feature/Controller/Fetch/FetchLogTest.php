@@ -135,7 +135,7 @@ class FetchLogTest extends TestCase
         ]);
 
         $response = $this->withCookie('jwt_token', $jwtToken)->post("/logging/$user->uuid/store", [
-            'type' => 'get_log_by_type',
+            'type' => 'get_log_by_time',
             'type_env' => 'testing',
             'time_start' => '2024-07-01T11:11:11',
             'time_end' => '2024-07-31T22:22:22',
@@ -153,5 +153,34 @@ class FetchLogTest extends TestCase
         $this->assertNotNull($uuidFromLog);
         Storage::deleteDirectory("public/get_log_by_time/{$uuidFromLog}");
         file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
+    }
+
+    public function test_fetch_delete_log_success(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Connection::factory()->create([
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+        $endpoint = 'https://endpoint.com/api/logging/0276ca0ac9d0e8442b5640072eba90f23d4c20054dc02429c9cbed60a98660b0';
+
+        Http::fake([
+            $endpoint => Http::response([
+                'data' => 'all data in log deleted successfully.',
+            ], 200, ['Authorization' => 'Bearer '.$jwtToken]),
+        ]);
+
+        $response = $this->withCookie('jwt_token', $jwtToken)->post("/logging/$user->uuid/store", [
+            'type' => 'delete_log',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect("/logging/$user->uuid");
+        $this->assertTrue(session()->has('success'));
+        $this->assertEquals('Successfully perform log operations', session('success'));
     }
 }

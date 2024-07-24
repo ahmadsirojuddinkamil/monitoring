@@ -100,7 +100,7 @@ class LoggingService
 
         if (isset($responseBody['data'])) {
             return $responseBody['data'];
-        } elseif (isset($responseBody['error'])) {
+        } else {
             throw new \Exception($responseBody['error']);
         }
     }

@@ -97,40 +97,29 @@ class LoggingController extends Controller
         $endpoint = $this->loggingService->endpointSelection($validateData);
 
         try {
-            $uuidDirectory = Uuid::uuid4()->toString();
-            $primaryDir = "public/{$validateData['type']}/".$uuidDirectory;
-            Storage::makeDirectory($primaryDir);
-
-            if (app()->environment('testing')) {
-                Log::info("directory testing, $uuidDirectory");
-            }
-
             $directories = ['local', 'testing', 'production', 'other'];
             $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
-
-            $payload = [
-                'type_env' => $validateData['type_env'] ?? null,
-                'time_start' => $validateData['time_start'] ?? null,
-                'time_end' => $validateData['time_end'] ?? null,
-            ];
 
             $ownerLog = Auth::user()->connection->uuid;
             $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
 
-            if ($payload['type_env'] == null && $payload['time_start'] == null && $payload['time_end'] == null) {
+            if (in_array($validateData['type'], ['get_log', 'get_log_by_type', 'get_log_by_time'])) {
+                $uuidDirectory = Uuid::uuid4()->toString();
+                $primaryDir = "public/{$validateData['type']}/".$uuidDirectory;
+                Storage::makeDirectory($primaryDir);
+
+                if (app()->environment('testing')) {
+                    Log::info("directory testing, $uuidDirectory");
+                }
+            }
+
+            if ($validateData['type'] === 'get_log') {
                 $this->loggingService->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
-            } elseif ($payload['type_env'] && $payload['time_start'] == null && $payload['time_end'] == null) {
-                $this->loggingService->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
-            } elseif ($payload['type_env'] && $payload['time_start'] && $payload['time_end']) {
+            } elseif (in_array($validateData['type'], ['get_log_by_type', 'get_log_by_time'])) {
                 $this->loggingService->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
             }
 
             return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');
-        } catch (\Illuminate\Http\Client\RequestException $error) {
-            $responseBody = $error->response->json();
-            $errorMessage = $responseBody['error'] ?? $responseBody['message'] ?? $responseBody['errors'] ?? 'An error occurred';
-
-            return redirect('/logging/'.Auth::user()->uuid)->with('error', $errorMessage);
         } catch (\Exception $error) {
             return redirect('/logging/'.Auth::user()->uuid)->with('error', $error->getMessage());
         }
