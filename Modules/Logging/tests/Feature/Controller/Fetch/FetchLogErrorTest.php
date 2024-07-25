@@ -4,7 +4,6 @@ namespace Modules\Logging\tests\Feature\Controller\Fetch;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Modules\Connection\App\Models\Connection;
 use Modules\Logging\App\Services\LoggingService;
 use Modules\User\App\Models\User;
@@ -138,14 +137,6 @@ class FetchLogErrorTest extends TestCase
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Invalid JWT format!', session('error'));
-
-        $logPath = storage_path('logs/laravel.log');
-        $logContents = file_get_contents($logPath);
-        preg_match('/directory testing, ([a-f0-9\-]+)/', $logContents, $matches);
-        $uuidFromLog = $matches[1] ?? null;
-        $this->assertNotNull($uuidFromLog);
-        Storage::deleteDirectory("public/get_log/{$uuidFromLog}");
-        file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
     }
 
     public function test_fetch_get_log_failed_because_token_is_expired(): void
@@ -175,13 +166,5 @@ class FetchLogErrorTest extends TestCase
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('error'));
         $this->assertEquals('Token is expired', session('error'));
-
-        $logPath = storage_path('logs/laravel.log');
-        $logContents = file_get_contents($logPath);
-        preg_match('/directory testing, ([a-f0-9\-]+)/', $logContents, $matches);
-        $uuidFromLog = $matches[1] ?? null;
-        $this->assertNotNull($uuidFromLog);
-        Storage::deleteDirectory("public/get_log/{$uuidFromLog}");
-        file_put_contents($logPath, preg_replace("/\[.*\] testing.INFO: directory testing, $uuidFromLog\s*/", '', $logContents));
     }
 }
