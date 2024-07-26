@@ -151,9 +151,8 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th class=" text-center">Endpoint</th>
                                         <th class=" text-center">Type</th>
-                                        <th class=" text-center">Date</th>
+                                        <th class=" text-center">Time Created</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -163,7 +162,6 @@
                                         <tr>
                                             <td>{{ ($loggings->currentPage() - 1) * $loggings->perPage() + $loop->iteration }}
                                             </td>
-                                            <td class=" text-center">{{ $endpoint }}</td>
                                             <td class=" text-center">{{ $logging->type }}</td>
                                             <td class=" text-center">{{ $logging->created_at }}</td>
                                             <td>

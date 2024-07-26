@@ -179,6 +179,8 @@
                                                     timeStartInput.value = '';
                                                     timeEndInput.value = '';
                                                     logType.setAttribute('required', 'required');
+                                                    timeStartInput.removeAttribute('required');
+                                                    timeEndInput.removeAttribute('required');
                                                 } else if (selectedValue === 'get_log_by_time' || selectedValue === 'delete_log_by_time') {
                                                     additionalInput.style.display = 'block';
                                                     inputTimeStart.style.display = 'block';
