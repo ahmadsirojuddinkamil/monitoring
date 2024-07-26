@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
 use Modules\Logging\App\Http\Requests\StoreLogRequest;
@@ -97,29 +95,10 @@ class LoggingController extends Controller
         $endpoint = $this->loggingService->endpointSelection($validateData);
 
         try {
-            $directories = ['local', 'testing', 'production', 'other'];
-            $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
-
-            $ownerLog = Auth::user()->connection->uuid;
             $logData = $this->loggingService->fetchEndpoint($validateData, $jwtToken, $endpoint);
+            $successMessage = $this->loggingService->handleLogActions($validateData, $logData);
 
-            if (in_array($validateData['type'], ['get_log', 'get_log_by_type', 'get_log_by_time'])) {
-                $uuidDirectory = Uuid::uuid4()->toString();
-                $primaryDir = "public/{$validateData['type']}/".$uuidDirectory;
-                Storage::makeDirectory($primaryDir);
-
-                if (app()->environment('testing')) {
-                    Log::info("directory testing, $uuidDirectory");
-                }
-            }
-
-            if ($validateData['type'] === 'get_log') {
-                $this->loggingService->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
-            } elseif (in_array($validateData['type'], ['get_log_by_type', 'get_log_by_time'])) {
-                $this->loggingService->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
-            }
-
-            return redirect('/logging/'.Auth::user()->uuid)->with('success', 'Successfully perform log operations');
+            return redirect('/logging/'.Auth::user()->uuid)->with('success', $successMessage);
         } catch (\Exception $error) {
             return redirect('/logging/'.Auth::user()->uuid)->with('error', $error->getMessage());
         }
