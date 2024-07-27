@@ -54,7 +54,7 @@ class FetchLogTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('success'));
-        $this->assertEquals('Successfully perform log operations', session('success'));
+        $this->assertEquals('Successfully get log', session('success'));
 
         $logPath = storage_path('logs/laravel.log');
         $logContents = file_get_contents($logPath);
@@ -98,7 +98,7 @@ class FetchLogTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('success'));
-        $this->assertEquals('Successfully perform log operations', session('success'));
+        $this->assertEquals('Successfully get log by type: testing', session('success'));
 
         $logPath = storage_path('logs/laravel.log');
         $logContents = file_get_contents($logPath);
@@ -144,7 +144,7 @@ class FetchLogTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('success'));
-        $this->assertEquals('Successfully perform log operations', session('success'));
+        $this->assertEquals('Successfully get log by type: testing, range time: 01 July 2024, 11:11 - 31 July 2024, 22:22', session('success'));
 
         $logPath = storage_path('logs/laravel.log');
         $logContents = file_get_contents($logPath);
@@ -181,6 +181,68 @@ class FetchLogTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect("/logging/$user->uuid");
         $this->assertTrue(session()->has('success'));
-        $this->assertEquals('Successfully perform log operations', session('success'));
+        $this->assertEquals('Successfully delete log', session('success'));
+    }
+
+    public function test_fetch_delete_log_by_type_success(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Connection::factory()->create([
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+        $endpoint = 'https://endpoint.com/api/logging/e5906be35c1a3ffbe05bd706b03f6ef7685e8e6be47b1f59d3b480303602cad6/type';
+
+        Http::fake([
+            $endpoint => Http::response([
+                'data' => 'success delete data logging by type: testing',
+            ], 200, ['Authorization' => 'Bearer '.$jwtToken]),
+        ]);
+
+        $response = $this->withCookie('jwt_token', $jwtToken)->post("/logging/$user->uuid/store", [
+            'type' => 'delete_log_by_type',
+            'type_env' => 'testing',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect("/logging/$user->uuid");
+        $this->assertTrue(session()->has('success'));
+        $this->assertEquals('Successfully delete log by type: testing', session('success'));
+    }
+
+    public function test_fetch_delete_log_by_time_success(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Connection::factory()->create([
+            'user_uuid' => $user->uuid,
+        ]);
+
+        $jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+        $endpoint = 'https://endpoint.com/api/logging/05bd300fdc5781213f29f05a6f99c7b74f2eb4a5b3dfc509c9387742de180d36/type/time';
+
+        Http::fake([
+            $endpoint => Http::response([
+                'data' => 'success delete data logging by type: testing and time: 2024-07-01T11:11:11 - 2024-07-31T22:22:22',
+            ], 200, ['Authorization' => 'Bearer '.$jwtToken]),
+        ]);
+
+        $response = $this->withCookie('jwt_token', $jwtToken)->post("/logging/$user->uuid/store", [
+            'type' => 'delete_log_by_time',
+            'type_env' => 'testing',
+            'time_start' => '2024-07-01T11:11:11',
+            'time_end' => '2024-07-31T22:22:22',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect("/logging/$user->uuid");
+        $this->assertTrue(session()->has('success'));
+        $this->assertEquals('Successfully delete log by type: testing, range time: 01 July 2024, 11:11 - 31 July 2024, 22:22', session('success'));
     }
 }

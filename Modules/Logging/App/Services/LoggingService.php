@@ -2,8 +2,10 @@
 
 namespace Modules\Logging\App\Services;
 
+use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel as ExportExcel;
@@ -157,5 +159,80 @@ class LoggingService
         } catch (\Exception $error) {
             return redirect('logging/'.Auth::user()->uuid.'/create')->with('error', 'Failed to create directory or export logs.');
         }
+    }
+
+    public function formatTimeFetchLog($validateData)
+    {
+        $timeStart = new DateTime($validateData['time_start']);
+        $timeEnd = new DateTime($validateData['time_end']);
+
+        $formattedTimeStart = $timeStart->format('d F Y, H:i');
+        $formattedTimeEnd = $timeEnd->format('d F Y, H:i');
+
+        return [
+            'timeStart' => $formattedTimeStart,
+            'timeEnd' => $formattedTimeEnd,
+        ];
+    }
+
+    public function generateDirectory($validateData)
+    {
+        $uuidDirectory = Uuid::uuid4()->toString();
+        $primaryDir = "public/{$validateData['type']}/".$uuidDirectory;
+        Storage::makeDirectory($primaryDir);
+
+        if (app()->environment('testing')) {
+            Log::info("directory testing, $uuidDirectory");
+        }
+
+        return $primaryDir;
+    }
+
+    public function handleLogActions($validateData, $logData)
+    {
+        $ownerLog = Auth::user()->connection->uuid;
+
+        $directories = ['local', 'testing', 'production', 'other'];
+        $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
+        $type = $validateData['type'];
+
+        switch ($type) {
+            case 'get_log':
+                $primaryDir = $this->generateDirectory($validateData);
+                $this->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
+                $successMessage = 'Successfully get log';
+                break;
+
+            case 'get_log_by_type':
+                $primaryDir = $this->generateDirectory($validateData);
+                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
+                $successMessage = 'Successfully get log by type: '.$validateData['type_env'];
+                break;
+
+            case 'get_log_by_time':
+                $primaryDir = $this->generateDirectory($validateData);
+                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
+                $formattedTime = $this->formatTimeFetchLog($validateData);
+                $successMessage = 'Successfully get log by type: '.$validateData['type_env'].', range time: '.$formattedTime['timeStart'].' - '.$formattedTime['timeEnd'];
+                break;
+
+            case 'delete_log':
+                $successMessage = 'Successfully delete log';
+                break;
+
+            case 'delete_log_by_type':
+                $successMessage = 'Successfully delete log by type: '.$validateData['type_env'];
+                break;
+
+            case 'delete_log_by_time':
+                $formattedTime = $this->formatTimeFetchLog($validateData);
+                $successMessage = 'Successfully delete log by type: '.$validateData['type_env'].', range time: '.$formattedTime['timeStart'].' - '.$formattedTime['timeEnd'];
+                break;
+
+            default:
+                throw new \Exception('Invalid type provided.');
+        }
+
+        return $successMessage;
     }
 }
