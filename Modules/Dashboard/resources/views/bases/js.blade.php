@@ -16,3 +16,6 @@
 
 <script src="{{ asset('assets/dashboard/js/moment.min.js') }}"></script>
 <script src="{{ asset('assets/dashboard/plugins/owlcarousel/owl.carousel.min.js') }}"></script>
+
+<script src="{{ asset('assets/dashboard/plugins/chartjs/chart.min.js') }}"></script>
+<script src="{{ asset('assets/dashboard/plugins/chartjs/chart-data.js') }}"></script>

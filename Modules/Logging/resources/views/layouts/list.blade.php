@@ -151,7 +151,8 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th class=" text-center">Type</th>
+                                        <th class=" text-center">Environment</th>
+                                        <th class=" text-center">Type Log</th>
                                         <th class=" text-center">Time Created</th>
                                         <th>Action</th>
                                     </tr>
@@ -160,12 +161,14 @@
                                 <tbody>
                                     @foreach ($loggings as $logging)
                                         <tr>
-                                            <td>{{ ($loggings->currentPage() - 1) * $loggings->perPage() + $loop->iteration }}
+                                            <td>
+                                                {{ ($loggings->currentPage() - 1) * $loggings->perPage() + $loop->iteration }}
                                             </td>
-                                            <td class=" text-center">{{ $logging->type }}</td>
+                                            <td class=" text-center">{{ $logging->type_env }}</td>
+                                            <td class=" text-center">{{ $logging->type_log }}</td>
                                             <td class=" text-center">{{ $logging->created_at }}</td>
                                             <td>
-                                                <a class="ms-3" href="">
+                                                <a class="ms-3" href="/logging/{{ $logging->uuid }}/show">
                                                     <img src="{{ asset('assets/dashboard/img/icons/show.png') }}"
                                                         height="25" width="25" alt="img">
                                                 </a>
