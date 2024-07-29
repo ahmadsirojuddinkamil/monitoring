@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
 use Modules\Logging\App\Http\Requests\StoreLogRequest;
+use Modules\Logging\App\Models\Logging;
 use Modules\Logging\App\Services\LoggingService;
+use Modules\Logging\Exports\ImportExcelLogging;
 use Ramsey\Uuid\Uuid;
 
 class LoggingController extends Controller
@@ -21,7 +24,7 @@ class LoggingController extends Controller
         $this->loggingService = $loggingService;
     }
 
-    public function viewMyLogging($saveUuidFromCall)
+    public function viewLoggingList($saveUuidFromCall)
     {
         if (! Uuid::isValid($saveUuidFromCall)) {
             return abort(404);
@@ -56,7 +59,7 @@ class LoggingController extends Controller
 
         return DB::transaction(function () use ($validationUser, $validationSearch) {
             $loggings = $validationUser['user']->connection->loggings()
-                ->where('type', $validationSearch['type'])
+                ->where('type_env', $validationSearch['type'])
                 ->whereBetween('created_at', [$validationSearch['time-start'], $validationSearch['time-end']])
                 ->paginate(2);
 
@@ -102,6 +105,40 @@ class LoggingController extends Controller
         } catch (\Exception $error) {
             return redirect('/logging/'.Auth::user()->uuid)->with('error', $error->getMessage());
         }
+    }
+
+    public function viewLogging($saveUuid)
+    {
+        if (! Uuid::isValid($saveUuid)) {
+            return abort(404);
+        }
+
+        $result = Logging::where('uuid', $saveUuid)->first();
+        $logLevel = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'];
+        $logFiles = array_filter(array_intersect_key($result->toArray(), array_flip($logLevel)));
+
+        $logDetails = [];
+        $logCounts = [];
+
+        foreach ($logFiles as $key => $file) {
+            $absolutePath = storage_path('app/'.$file);
+
+            if (! file_exists($absolutePath)) {
+                abort(404, 'File not found.');
+            }
+
+            $import = new ImportExcelLogging();
+            ExportExcel::import($import, $absolutePath);
+
+            $logDetails[$key] = $import->allData;
+            $logCounts[$key] = $import->rowCount;
+        }
+
+        return view('logging::layouts.show', [
+            'result' => $result,
+            'allData' => $logDetails,
+            'logCounts' => $logCounts,
+        ]);
     }
 
     public function viewLogin()
