@@ -18,8 +18,9 @@ class Logging extends Model
     protected $fillable = [
         'uuid',
         'connection_uuid',
-        'type',
-        'data',
+        'type_env',
+        'type_log',
+        'other',
         'emergency',
         'alert',
         'critical',
@@ -43,13 +44,14 @@ class Logging extends Model
     }
 
     // Query
-    public static function createLogging($saveDir, $saveOther, $savePath, $saveOwnerLog)
+    public static function createLogging($saveDir, $saveOther, $savePath, $saveOwnerLog, $saveTypeLog)
     {
         return self::create([
             'uuid' => Uuid::uuid4(),
             'connection_uuid' => $saveOwnerLog,
-            'type' => $saveDir,
-            'data' => $saveOther ?? null,
+            'type_env' => $saveDir,
+            'type_log' => $saveTypeLog,
+            'other' => $saveOther ?? null,
             'info' => $savePath['info'] ?? null,
             'emergency' => $savePath['emergency'] ?? null,
             'alert' => $savePath['alert'] ?? null,

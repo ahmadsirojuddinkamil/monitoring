@@ -15,8 +15,9 @@ return new class() extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignUuid('connection_uuid')->nullable();
-            $table->string('type')->nullable();
-            $table->string('data')->nullable();
+            $table->string('type_env')->nullable();
+            $table->string('type_log')->nullable();
+            $table->string('other')->nullable();
             $table->string('emergency')->nullable();
             $table->string('alert')->nullable();
             $table->string('critical')->nullable();

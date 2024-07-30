@@ -107,7 +107,7 @@ class LoggingService
         }
     }
 
-    public function generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData)
+    public function generateExportGetLog($directories, $types, $typeLog, $primaryDir, $ownerLog, $logData)
     {
         foreach ($directories as $dir) {
             $listPathGeneral = array_fill_keys($types, null);
@@ -117,7 +117,7 @@ class LoggingService
                 $pathOther = "$primaryDir/other/other_{$uuid}.xlsx";
                 ExportExcel::store(new ExportExcelLogging($logData[$dir] ?? []), $pathOther);
 
-                Logging::createLogging($dir, $pathOther, $listPathGeneral, $ownerLog);
+                Logging::createLogging($dir, $pathOther, $listPathGeneral, $ownerLog, $typeLog);
             } else {
                 Storage::makeDirectory("$primaryDir/$dir");
 
@@ -130,12 +130,12 @@ class LoggingService
                     }
                 }
 
-                Logging::createLogging($dir, null, $listPathGeneral, $ownerLog);
+                Logging::createLogging($dir, null, $listPathGeneral, $ownerLog, $typeLog);
             }
         }
     }
 
-    public function generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types)
+    public function generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types, $typeLog)
     {
         try {
             $typeEnv = $validateData['type_env'];
@@ -152,7 +152,7 @@ class LoggingService
                     $listPathGeneral[$typeName] = $pathGeneral;
                 }
 
-                Logging::createLogging($typeEnv, null, $listPathGeneral, $ownerLog);
+                Logging::createLogging($typeEnv, null, $listPathGeneral, $ownerLog, $typeLog);
             } else {
                 throw new \Exception();
             }
@@ -194,24 +194,24 @@ class LoggingService
 
         $directories = ['local', 'testing', 'production', 'other'];
         $types = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug'];
-        $type = $validateData['type'];
+        $typeLog = $validateData['type'];
 
-        switch ($type) {
+        switch ($typeLog) {
             case 'get_log':
                 $primaryDir = $this->generateDirectory($validateData);
-                $this->generateExportGetLog($directories, $types, $primaryDir, $ownerLog, $logData);
+                $this->generateExportGetLog($directories, $types, $typeLog, $primaryDir, $ownerLog, $logData);
                 $successMessage = 'Successfully get log';
                 break;
 
             case 'get_log_by_type':
                 $primaryDir = $this->generateDirectory($validateData);
-                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
+                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types, $typeLog);
                 $successMessage = 'Successfully get log by type: '.$validateData['type_env'];
                 break;
 
             case 'get_log_by_time':
                 $primaryDir = $this->generateDirectory($validateData);
-                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types);
+                $this->generateExportGetLogFilter($validateData, $logData, $primaryDir, $ownerLog, $types, $typeLog);
                 $formattedTime = $this->formatTimeFetchLog($validateData);
                 $successMessage = 'Successfully get log by type: '.$validateData['type_env'].', range time: '.$formattedTime['timeStart'].' - '.$formattedTime['timeEnd'];
                 break;
