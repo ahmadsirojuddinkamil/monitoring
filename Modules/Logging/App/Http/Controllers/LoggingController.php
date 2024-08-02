@@ -114,11 +114,22 @@ class LoggingController extends Controller
         }
 
         $result = Logging::where('uuid', $saveUuid)->first();
+
+        if (! $result) {
+            return abort(404);
+        }
+
+        $connection = Auth::user()->connection;
+
+        if ($connection->uuid != $result->connection_uuid) {
+            return abort(404);
+        }
+
         $logLevel = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'];
         $logFiles = array_filter(array_intersect_key($result->toArray(), array_flip($logLevel)));
 
         $logDetails = [];
-        $logCounts = [];
+        $logCounts = array_fill_keys($logLevel, 0);
 
         foreach ($logFiles as $key => $file) {
             $absolutePath = storage_path('app/'.$file);
@@ -136,9 +147,54 @@ class LoggingController extends Controller
 
         return view('logging::layouts.show', [
             'result' => $result,
-            'allData' => $logDetails,
+            'logDetails' => $logDetails,
+            'logFiles' => $logFiles,
             'logCounts' => $logCounts,
         ]);
+    }
+
+    public function downloadLog($saveUuid, $saveType)
+    {
+        if (! Uuid::isValid($saveUuid)) {
+            return abort(404);
+        }
+
+        $logLevel = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'];
+
+        if (! in_array($saveType, $logLevel)) {
+            return abort(404);
+        }
+
+        $result = Logging::where('uuid', $saveUuid)->first();
+
+        if (! $result) {
+            return abort(404);
+        }
+
+        $connection = Auth::user()->connection;
+
+        if ($connection->uuid != $result->connection_uuid) {
+            return abort(404);
+        }
+
+        $logFiles = array_filter(array_intersect_key($result->toArray(), array_flip($logLevel)));
+
+        $filePath = $logFiles[$saveType] ?? null;
+
+        if (! $filePath) {
+            return abort(404, 'File path not found.');
+        }
+
+        $absolutePath = storage_path('app/'.$filePath);
+
+        if (! file_exists($absolutePath)) {
+            return abort(404, 'File not found.');
+        }
+
+        $timestamp = date('Y-m-d_H-i-s');
+        $customFileName = "Log_{$saveType}_{$timestamp}.xlsx";
+
+        return response()->download($absolutePath, $customFileName);
     }
 
     public function viewLogin()
