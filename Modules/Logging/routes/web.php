@@ -14,5 +14,6 @@ Route::controller(LoggingController::class)->group(function () {
         Route::get('/logging/{save_uuid_from_call}/create', 'viewCreate')->name('logging.view.create');
         Route::post('/logging/{save_uuid_from_call}/store', 'storeCreate')->name('logging.store.create');
         Route::get('/logging/{save_uuid_from_call}/show', 'viewLogging')->name('logging.view.show');
+        Route::get('/logging/{save_uuid_from_call}/{save_type_log_from_call}/download', 'downloadLog')->name('logging.download.file');
     });
 });
