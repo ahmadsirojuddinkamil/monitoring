@@ -44,20 +44,110 @@
                     </div>
                 @endif
 
-                {{-- <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Bar Chart</div>
-                        </div>
+                <style>
+                    .chart-container {
+                        position: relative;
+                        height: 400px;
+                        width: 100%;
+                    }
+                </style>
 
-                        <div class="card-body">
-                            <div>
-                                <canvas id="chartBar1" class="h-300"></canvas>
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-2">
+                            <div class="chart-container">
+                                <canvas id="myBarChart"></canvas>
                             </div>
                         </div>
                     </div>
-                </div> --}}
+                </div>
 
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+                    var ctx = document.getElementById('myBarChart').getContext('2d');
+                    var myBarChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'],
+                            datasets: [{
+                                label: 'Diagram Bar',
+                                data: [
+                                    {{ $logCounts['info'] ?? 0 }},
+                                    {{ $logCounts['emergency'] ?? 0 }},
+                                    {{ $logCounts['alert'] ?? 0 }},
+                                    {{ $logCounts['critical'] ?? 0 }},
+                                    {{ $logCounts['error'] ?? 0 }},
+                                    {{ $logCounts['warning'] ?? 0 }},
+                                    {{ $logCounts['notice'] ?? 0 }},
+                                    {{ $logCounts['debug'] ?? 0 }},
+                                    {{ $logCounts['other'] ?? 0 }}
+                                ],
+                                backgroundColor: '#FF9F43',
+                                borderColor: '#FF9F43',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    suggestedMin: 0,
+                                    max: 100,
+                                    suggestedMax: 110,
+                                    ticks: {
+                                        stepSize: 10,
+                                        callback: function(value) {
+                                            return value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    });
+                </script>
+
+                <br>
+
+                <div class="row">
+                    @foreach ($logDetails as $key => $logs)
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        {{ ucfirst($key) }}
+                                                        <a href="/logging/{{ $result->uuid }}/{{ strtolower($key) }}/download"
+                                                            class="link-with-margin">
+                                                            <img src="{{ asset('assets/dashboard/img/icons/downloads.png') }}"
+                                                                alt="img" height="20" width="20"
+                                                                style="margin-left: 10px;">
+                                                        </a>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @foreach ($logs as $log)
+                                                    <tr>
+                                                        <td>{{ json_encode($log) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
 

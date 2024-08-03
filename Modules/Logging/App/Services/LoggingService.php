@@ -14,6 +14,7 @@ use Modules\Logging\App\Models\Logging;
 use Modules\Logging\Exports\ExportExcelLogging;
 use Modules\User\App\Models\User;
 use Ramsey\Uuid\Uuid;
+use Shuchkin\SimpleXLSXGen;
 
 class LoggingService
 {
@@ -56,9 +57,11 @@ class LoggingService
             'user_uuid' => $saveUser->uuid,
         ]);
 
-        Logging::factory()->create([
+        $logging = Logging::factory()->create([
             'connection_uuid' => $connection->uuid,
         ]);
+
+        return $logging;
     }
 
     public function endpointSelection($saveType)
@@ -234,5 +237,34 @@ class LoggingService
         }
 
         return $successMessage;
+    }
+
+    public function generateFileExcel()
+    {
+        $folderPath = 'public/get_log/466e8813-f629-4c63-a066-5d21fe789c2e/testing';
+
+        if (! Storage::exists($folderPath)) {
+            Storage::makeDirectory($folderPath);
+        }
+
+        $files = [
+            'testing_error_7dc245b7-89b2-4b06-bdc6-4719acfe8432.xlsx' => [
+                ['[2024-08-01 13:29:08] local.ERROR: Attempt to read property "connection_uuid" on null {"userId":1,"exception":"[object] (ErrorException(code: 0): Attempt to read property \"connection_uuid\" on null at /home/laptop/program/php/laravel/monitoring master/monitoring/Modules/Logging/App/Http/Controllers/LoggingController.php:124)'],
+            ],
+        ];
+
+        foreach ($files as $fileName => $data) {
+            $filePath = "{$folderPath}/{$fileName}";
+            $xlsx = SimpleXLSXGen::fromArray($data);
+            $xlsx->saveAs(storage_path('app/'.$filePath));
+        }
+    }
+
+    public function deleteFileExcel()
+    {
+        $folderPath = 'public/get_log/466e8813-f629-4c63-a066-5d21fe789c2e';
+        if (Storage::exists($folderPath)) {
+            Storage::deleteDirectory($folderPath);
+        }
     }
 }
