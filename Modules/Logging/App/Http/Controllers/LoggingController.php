@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel as ExportExcel;
 use Modules\Logging\App\Http\Requests\LoginLogRequest;
 use Modules\Logging\App\Http\Requests\RegisterLogRequest;
@@ -24,13 +25,13 @@ class LoggingController extends Controller
         $this->loggingService = $loggingService;
     }
 
-    public function viewLoggingList($saveUuidFromCall)
+    public function viewLoggingList($saveUuid)
     {
-        if (! Uuid::isValid($saveUuidFromCall)) {
+        if (! Uuid::isValid($saveUuid)) {
             return abort(404);
         }
 
-        $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
+        $validationUser = $this->loggingService->validationUser($saveUuid);
 
         return DB::transaction(function () use ($validationUser) {
             $loggings = $validationUser['user']->connection->loggings()->latest()->paginate(5);
@@ -43,18 +44,18 @@ class LoggingController extends Controller
         });
     }
 
-    public function searchLogging($saveUuidFromCall)
+    public function searchLogging($saveUuid)
     {
-        if (! Uuid::isValid($saveUuidFromCall)) {
+        if (! Uuid::isValid($saveUuid)) {
             return abort(404);
         }
 
-        $validationUser = $this->loggingService->validationUser($saveUuidFromCall);
+        $validationUser = $this->loggingService->validationUser($saveUuid);
 
         $validationSearch = $this->loggingService->validationSearch();
 
         if (! is_array($validationSearch)) {
-            return redirect('/logging/'.$saveUuidFromCall)->with('error', $validationSearch);
+            return redirect('/logging/'.$saveUuid)->with('error', $validationSearch);
         }
 
         return DB::transaction(function () use ($validationUser, $validationSearch) {
@@ -119,9 +120,7 @@ class LoggingController extends Controller
             return abort(404);
         }
 
-        $connection = Auth::user()->connection;
-
-        if ($connection->uuid != $result->connection_uuid) {
+        if (Auth::user()->connection->uuid != $result->connection_uuid) {
             return abort(404);
         }
 
@@ -153,6 +152,57 @@ class LoggingController extends Controller
         ]);
     }
 
+    public function downloadLogs($saveUuid)
+    {
+        if (! Uuid::isValid($saveUuid)) {
+            return abort(404);
+        }
+
+        $logs = Logging::where('uuid', $saveUuid)->first();
+
+        if (! $logs) {
+            return abort(404);
+        }
+
+        if (Auth::user()->connection->uuid != $logs->connection_uuid) {
+            return abort(404);
+        }
+
+        $logLevel = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'];
+        $logFiles = array_filter(array_intersect_key($logs->toArray(), array_flip($logLevel)));
+
+        if (empty($logFiles)) {
+            return abort(404);
+        }
+
+        $zipFileName = 'logs_environment_'.$logs->type_env.'_type_'.$logs->type_log.'_'.$logs->created_at->format('Y_M_d_H_i_s').'.zip';
+        $zipFilePath = storage_path('app/public/'.$zipFileName);
+
+        $zip = new \ZipArchive();
+
+        if ($zip->open($zipFilePath, \ZipArchive::CREATE) !== true) {
+            return abort(404);
+        }
+
+        $folderName = pathinfo($zipFileName, PATHINFO_FILENAME);
+        $zip->addEmptyDir($folderName);
+
+        foreach ($logFiles as $file) {
+            $filePath = storage_path('app/'.$file);
+
+            if (file_exists($filePath)) {
+                $fileName = preg_replace('/_[a-f0-9-]{36}/i', '', basename($file));
+                $zip->addFile($filePath, $folderName.'/'.$fileName);
+            } else {
+                return abort(404);
+            }
+        }
+
+        $zip->close();
+
+        return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    }
+
     public function downloadLog($saveUuid, $saveType)
     {
         if (! Uuid::isValid($saveUuid)) {
@@ -171,9 +221,7 @@ class LoggingController extends Controller
             return abort(404);
         }
 
-        $connection = Auth::user()->connection;
-
-        if ($connection->uuid != $result->connection_uuid) {
+        if (Auth::user()->connection->uuid != $result->connection_uuid) {
             return abort(404);
         }
 
@@ -258,5 +306,48 @@ class LoggingController extends Controller
         } catch (\Exception $error) {
             return redirect('/logging/register')->with('error', $error->getMessage());
         }
+    }
+
+    public function deleteLogging($saveUuid)
+    {
+        if (! Uuid::isValid($saveUuid)) {
+            return abort(404);
+        }
+
+        $result = Logging::where('uuid', $saveUuid)->first();
+
+        if (! $result) {
+            return abort(404);
+        }
+
+        $user = Auth::user();
+
+        if ($user->connection->uuid != $result->connection_uuid) {
+            return abort(404);
+        }
+
+        $logLevel = ['info', 'emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'debug', 'other'];
+        $logFiles = array_filter(array_intersect_key($result->toArray(), array_flip($logLevel)));
+        $secondaryPath = dirname(array_values($logFiles)[0] ?? null);
+
+        $filteredPathParts = array_filter(explode('/', $secondaryPath), function ($typeLog) {
+            return ! in_array($typeLog, ['local', 'testing', 'production', 'other']);
+        });
+
+        $primaryPath = implode('/', $filteredPathParts);
+
+        if (Storage::exists($secondaryPath)) {
+            Storage::deleteDirectory($secondaryPath);
+
+            $countDir = count(Storage::allDirectories($primaryPath));
+
+            if ($countDir === 0) {
+                Storage::deleteDirectory($primaryPath);
+            }
+        }
+
+        $result->delete();
+
+        return redirect('/logging/'.$user->uuid)->with('success', 'Success deleted your log!');
     }
 }

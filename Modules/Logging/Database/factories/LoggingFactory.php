@@ -19,17 +19,17 @@ class LoggingFactory extends Factory
      */
     public function definition(): array
     {
-        $listEnv = ['local', 'testing', 'production'];
-        $randomEnv = Arr::random($listEnv);
+        // $listEnv = ['local', 'testing', 'production'];
+        // $randomEnv = Arr::random($listEnv);
 
-        $listLog = ['get_log', 'get_log_by_type', 'get_log_by_time', 'delete_log', 'delete_log_by_type', 'delete_log_by_time'];
-        $randomLog = Arr::random($listLog);
+        // $listLog = ['get_log', 'get_log_by_type', 'get_log_by_time', 'delete_log', 'delete_log_by_type', 'delete_log_by_time'];
+        // $randomLog = Arr::random($listLog);
 
         return [
             'uuid' => Uuid::uuid4(),
             'connection_uuid' => null,
-            'type_env' => $randomEnv,
-            'type_log' => $randomLog,
+            'type_env' => 'testing',
+            'type_log' => 'get_log',
             'other' => '',
             'emergency' => '',
             'alert' => '',

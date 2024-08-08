@@ -2,6 +2,7 @@
 
 namespace Modules\Logging\App\Services;
 
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -266,5 +267,11 @@ class LoggingService
         if (Storage::exists($folderPath)) {
             Storage::deleteDirectory($folderPath);
         }
+    }
+
+    public function deleteFileZip($saveCreatedAt)
+    {
+        $formattedDate = Carbon::parse($saveCreatedAt)->format('Y_M_d_H_i_s');
+        unlink(storage_path('app/public/logs_environment_testing_type_get_log_'.$formattedDate.'.zip'));
     }
 }
