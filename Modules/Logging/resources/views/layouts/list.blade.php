@@ -64,7 +64,7 @@
                             </div>
 
                             <div class="wordset">
-                                <ul>
+                                {{-- <ul>
                                     <li>
                                         <a data-bs-toggle="tooltip" data-bs-placement="top" title="pdf"><img
                                                 src="{{ asset('assets/dashboard/img/icons/pdf.svg') }}"
@@ -76,7 +76,7 @@
                                                 src="{{ asset('assets/dashboard/img/icons/excel.svg') }}"
                                                 alt="img"></a>
                                     </li>
-                                </ul>
+                                </ul> --}}
                             </div>
                         </div>
 
@@ -154,7 +154,7 @@
                                         <th class=" text-center">Environment</th>
                                         <th class=" text-center">Type Log</th>
                                         <th class=" text-center">Time Created</th>
-                                        <th>Action</th>
+                                        <th class=" text-center">Action</th>
                                     </tr>
                                 </thead>
 
@@ -167,11 +167,62 @@
                                             <td class=" text-center">{{ $logging->type_env }}</td>
                                             <td class=" text-center">{{ $logging->type_log }}</td>
                                             <td class=" text-center">{{ $logging->created_at }}</td>
-                                            <td>
+                                            <td class=" text-center">
                                                 <a class="ms-3" href="/logging/{{ $logging->uuid }}/show">
                                                     <img src="{{ asset('assets/dashboard/img/icons/show.png') }}"
                                                         height="25" width="25" alt="img">
                                                 </a>
+
+                                                <a class="ms-3" href="/logging/{{ $logging->uuid }}/download">
+                                                    <img src="{{ asset('assets/dashboard/img/icons/excel.svg') }}"
+                                                        height="25" width="25" alt="img">
+                                                </a>
+
+                                                <a class="action-button ms-3" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal{{ $logging->uuid }}">
+                                                    <img src="{{ asset('assets/dashboard/img/icons/delete.svg') }}"
+                                                        alt="img">
+                                                </a>
+
+                                                <style>
+                                                    .modal-body {
+                                                        text-align: left;
+                                                    }
+                                                </style>
+
+                                                <div class="modal fade" id="exampleModal{{ $logging->uuid }}"
+                                                    tabindex="-1" aria-labelledby="exampleModalLabel"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">Are you
+                                                                    sure?</h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+                                                                This log will be deleted!
+                                                            </div>
+
+                                                            <div class="modal-footer d-flex justify-content-end">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">No</button>
+
+                                                                <form action="/logging/{{ $logging->uuid }}/delete"
+                                                                    method="POST" class="action-form">
+                                                                    @csrf
+                                                                    @method('DELETE')
+
+                                                                    <button type="submit"
+                                                                        class="btn btn-submit me-2">Ya</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
